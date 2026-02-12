@@ -6,10 +6,18 @@ import researcherBackground from '../assets/backgrounds/researcher-background.pn
 import avatar1 from '../assets/avatars/avatar1.png'
 import avatar2 from '../assets/avatars/avatar2.png'
 import avatar3 from '../assets/avatars/avatar3.png'
+import rolesData from '../data/roles.json'
+
+// Map background image paths to imported images
+const backgroundImages = {
+  'designer-background.png': designerBackground.src,
+  'builder-background.png': builderBackground.src,
+  'researcher-background.png': researcherBackground.src,
+}
 
 /**
  * Hero - The main hero section of the portfolio
- * 
+ *
  * Features:
  * - Navigation bar (ABOUT, WORK, BLOG)
  * - Main hero content with intro text and avatar
@@ -29,44 +37,14 @@ function Hero() {
     return () => clearInterval(interval)
   }, [avatars.length])
 
-  // Role configurations matching the design
-  const roles = [
-    {
-      title: 'Designer',
-      body: [
-        <>6 years experience as a product designer across <strong>trading, defence, consulting</strong> and <strong>AI/ML</strong>.</>,
-        <>Scaling products from 0 to <strong>Launch</strong>.</>
-      ],
-      backgroundColor: 'bg-[#803748]',
-      backgroundImage: designerBackground,
-      backgroundImageOpacity: 0.2,
-      backgroundImageEdge: 'right'
-    },
-    {
-      title: 'Builder',
-      body: [
-        'BEng Computing - Imperial College.',
-        '2 years as UX Engineer at Improbable.',
-        'Nowadays, I ship code when needed, and build stuff for fun.'
-      ],
-      backgroundColor: 'bg-[#A69A7D]',
-      backgroundImage: builderBackground,
-      backgroundImageOpacity: 0.2,
-      backgroundImageEdge: 'left'
-    },
-    {
-      title: 'Researcher',
-      body: [
-        'MSc Human Computer Interaction',
-        '3 research projects in AR/VR.',
-        '1 published paper.'
-      ],
-      backgroundColor: 'bg-[#303f83]',
-      backgroundImage: researcherBackground,
-      backgroundImageOpacity: 0.2,
-      backgroundImageEdge: 'left'
-    }
-  ]
+  // Map roles from JSON data, parsing HTML in body text
+  const roles = rolesData.map(role => ({
+    ...role,
+    backgroundImage: backgroundImages[role.backgroundImagePath],
+    body: role.body.map(text =>
+      text.includes('<') ? <span dangerouslySetInnerHTML={{ __html: text }} /> : text
+    )
+  }))
 
   return (
     <section className="relative">
@@ -79,35 +57,6 @@ function Hero() {
         aria-hidden="true"
       />
       
-      {/* Navigation Bar */}
-      <nav className="absolute top-0 right-0 z-50 p-6 sm:p-8">
-        <ul className="flex gap-6 sm:gap-8">
-          <li>
-            <a 
-              href="#about" 
-              className="font-job-role text-white uppercase tracking-wide text-sm sm:text-base hover:opacity-80 transition-opacity"
-            >
-              ABOUT
-            </a>
-          </li>
-          <li>
-            <a 
-              href="#work" 
-              className="font-job-role text-white uppercase tracking-wide text-sm sm:text-base hover:opacity-80 transition-opacity"
-            >
-              WORK
-            </a>
-          </li>
-          <li>
-            <a 
-              href="#blog" 
-              className="font-job-role text-white uppercase tracking-wide text-sm sm:text-base hover:opacity-80 transition-opacity"
-            >
-              BLOG
-            </a>
-          </li>
-        </ul>
-      </nav>
 
       {/* Main Hero Content */}
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-8 sm:pb-12">
@@ -129,21 +78,26 @@ function Hero() {
           </div>
 
           {/* Right Side - Avatar Image */}
-          <div className="flex-1 lg:w-1/2 flex justify-center relative z-20">
-            <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96">
-              {/* Avatar image - looping through 3 images with smooth crossfade */}
-              <div className="w-full h-full rounded-full object-cover overflow-hidden border-4 border-white/20 shadow-2xl bg-gradient-to-br from-purple-400/30 to-blue-500/30 relative">
-                {avatars.map((avatar, index) => (
-                  <img 
-                    key={index}
-                    src={avatar} 
-                    alt="Amanda" 
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
-                      index === currentAvatarIndex ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  />
-                ))}
-              </div>
+          <div className="flex-1 lg:w-1/2 flex justify-center items-center relative z-20">
+            <div
+              className="relative border-4 border-white/20 shadow-2xl"
+              style={{
+                width: '24rem',
+                height: '24rem',
+                borderRadius: '50%',
+                overflow: 'hidden'
+              }}
+            >
+              {avatars.map((avatar, index) => (
+                <img
+                  key={index}
+                  src={avatar.src}
+                  alt="Amanda"
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                    index === currentAvatarIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>

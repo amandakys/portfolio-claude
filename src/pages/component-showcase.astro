@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import ComponentShowcase from '../components/ComponentShowcase.jsx';
+---
+
+<BaseLayout title="Component Showcase | Amanda Koh" description="Visual testing ground for portfolio components.">
+  <Nav currentPage="component-showcase" />
+  <ComponentShowcase client:load />
+</BaseLayout>

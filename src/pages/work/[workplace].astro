@@ -1,0 +1,23 @@
+---
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+
+  // Get projects that have a workplace field (use slug for URL)
+  const workplaceProjects = projects.filter(p => p.data.workplace);
+
+  return workplaceProjects.map(entry => ({
+    params: { workplace: entry.slug },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await entry.render();
+---
+
+<ProjectLayout entry={entry} headings={headings}>
+  <Content />
+</ProjectLayout>

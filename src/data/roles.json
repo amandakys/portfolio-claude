@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Designer",
+    "body": [
+      "6 years experience as a product designer across <strong>trading, defence, consulting</strong> and <strong>AI/ML</strong>.",
+      "Scaling products from 0 to <strong>Launch</strong>."
+    ],
+    "backgroundColor": "bg-[#803748]",
+    "backgroundImagePath": "designer-background.png",
+    "backgroundImageOpacity": 0.2,
+    "backgroundImageEdge": "right"
+  },
+  {
+    "title": "Builder",
+    "body": [
+      "BEng Computing - Imperial College.",
+      "2 years as UX Engineer at Improbable.",
+      "Today, I ship code when needed, and build for fun."
+    ],
+    "backgroundColor": "bg-[#A69A7D]",
+    "backgroundImagePath": "builder-background.png",
+    "backgroundImageOpacity": 0.2,
+    "backgroundImageEdge": "left"
+  },
+  {
+    "title": "Researcher",
+    "body": [
+      "MSc Human Computer Interaction",
+      "3 research projects in AR/VR.",
+      "1 published first-author paper."
+    ],
+    "backgroundColor": "bg-[#303f83]",
+    "backgroundImagePath": "researcher-background.png",
+    "backgroundImageOpacity": 0.2,
+    "backgroundImageEdge": "left"
+  }
+]

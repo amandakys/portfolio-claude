@@ -32,7 +32,7 @@ function About() {
                   By day, I solve design problems in technical domains. By night, I channel unused creative energy into weird art projects. And the drums. And pottery. And whatever the latest obsession is. I'm indecisive like that.
                 </p>
                 <p className="font-body text-white text-base sm:text-lg lg:text-xl leading-relaxed text-left">
-                  For a professional bio, visit the <a href="#about" className="text-[#FC6B55] hover:opacity-80 transition-opacity underline">About</a> page.
+                  For a professional bio, visit the <a href="/about" className="text-[#FC6B55] hover:opacity-80 transition-opacity underline">About</a> page.
                 </p>
               </div>
             </div>
@@ -58,21 +58,21 @@ function About() {
                   especially for AR/VR projects
                 </p>
                 <p className="font-body text-white text-base sm:text-lg lg:text-xl leading-relaxed">
-                  but also, end-to-end design for technical products
+                  but also, product strategy and end-to-end design for technical products
                 </p>
               </div>
 
               {/* LinkedIn Icon */}
               <div className="flex-shrink-0">
                 <a 
-                  href="https://www.linkedin.com/in/amanda-koh" 
+                  href="https://www.linkedin.com/in/amandakys" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-block hover:opacity-80 transition-opacity"
                   aria-label="Visit Amanda's LinkedIn profile"
                 >
-                  <img 
-                    src={linkedinLogo} 
+                  <img
+                    src={linkedinLogo.src}
                     alt="LinkedIn" 
                     className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14"
                   />

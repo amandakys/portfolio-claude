@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.jsx';
+import Work from '../components/Work.astro';
+import Projects from '../components/Projects.jsx';
+import About from '../components/About.jsx';
+import { getCollection } from 'astro:content';
+
+// Fetch projects with showOnHomepage: true, sorted by date (newest first)
+const allProjects = await getCollection('projects');
+const homepageProjects = allProjects
+  .filter(p => p.data.showOnHomepage)
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .map(p => {
+    const isWorkplace = p.data.workplace && p.slug === p.data.workplace;
+    return {
+      title: p.data.title,
+      description: p.data.description,
+      tags: p.data.tags || [],
+      thumbnail: p.data.thumbnail?.src || null,
+      slug: p.slug,
+      href: isWorkplace ? `/work/${p.data.workplace}` : `/projects/${p.slug}`,
+    };
+  });
+---
+
+<BaseLayout>
+  <Nav currentPage="home" />
+  <Hero client:load />
+  <Work />
+  <Projects projects={homepageProjects} />
+  <About />
+</BaseLayout>

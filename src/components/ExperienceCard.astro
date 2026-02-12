@@ -1,0 +1,79 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  backgroundImage: ImageMetadata;
+  logoImage: ImageMetadata;
+  logoImageAlt: string;
+  jobRole: string;
+  companyName?: string;
+  description?: string;
+  alt?: string;
+  href?: string;
+  tags?: string[];
+}
+
+const {
+  backgroundImage,
+  logoImage,
+  logoImageAlt,
+  jobRole,
+  companyName = '',
+  description = '',
+  alt = '',
+  href,
+  tags = []
+} = Astro.props;
+
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  href={href}
+  class="group block bg-white/10 hover:bg-white/20 backdrop-blur-sm overflow-hidden transition-all duration-300"
+>
+  {/* Image area with background + logo overlay */}
+  <div class="relative aspect-video overflow-hidden">
+    <Image
+      src={backgroundImage}
+      alt={alt || `${companyName} background`}
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      widths={[400, 600, 800]}
+      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+    />
+    {/* Dark overlay for better logo visibility */}
+    <div
+      class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"
+      aria-hidden="true"
+    />
+    {/* Centered logo */}
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <Image
+        src={logoImage}
+        alt={logoImageAlt}
+        class="max-h-[50px] max-w-[70%] w-auto h-auto object-contain"
+      />
+    </div>
+  </div>
+
+  {/* Content section */}
+  <div class="p-6">
+    <h3 class="font-heading text-xl text-white mb-2 group-hover:text-[#FAE397] transition-colors">
+      {jobRole}
+    </h3>
+    {description && (
+      <p class="font-body text-white/70 text-sm line-clamp-2">
+        {description}
+      </p>
+    )}
+    {tags && tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mt-3">
+        {tags.map((tag) => (
+          <span class="font-body text-xs px-2 py-1 bg-white/10 text-white/60 rounded">
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+</Tag>

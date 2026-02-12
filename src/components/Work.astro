@@ -1,0 +1,141 @@
+---
+import ExperienceCard from './ExperienceCard.astro';
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+
+import kedroBackground from '../assets/backgrounds/kedro-background.png';
+import mavenBackground from '../assets/backgrounds/maven-background.png';
+import improbableBackground from '../assets/backgrounds/improbable-background.png';
+import kedroLogo from '../assets/logos/kedro-logo.png';
+import mavenLogo from '../assets/logos/maven-logo.png';
+import improbableLogo from '../assets/logos/improbable-logo.png';
+import quantumblackLogo from '../assets/logos/quantumblack-logo.png';
+import quantcoLogo from '../assets/logos/quantco-logo.png';
+
+// Fetch project descriptions
+const projects = await getCollection('projects');
+const quantumblackProject = projects.find(p => p.slug === 'quantumblack');
+const mavenProject = projects.find(p => p.slug === 'maven');
+const improbableProject = projects.find(p => p.slug === 'improbable');
+---
+
+<section id="work" class="relative overflow-hidden py-12 sm:py-16 lg:py-20 2xl:py-12 z-10">
+  {/* Container */}
+  <div class="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+
+    {/* Middle Section: Work Title, Company Logos, and Current Work Indicator */}
+    <div class="mb-16 sm:mb-20 lg:mb-24 2xl:mb-16">
+      {/* Work Title */}
+      <div class="text-center mb-8 sm:mb-12">
+        <h2 class="font-ebrula text-6xl sm:text-7xl lg:text-8xl xl:text-9xl text-[#FC6B55] leading-tight">
+          Work
+        </h2>
+      </div>
+
+      {/* Company Logos with Current Work Indicator */}
+      <div class="relative">
+        {/* Company Logos */}
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-16">
+          {/* IMPROBABLE Logo */}
+          <div class="flex items-center justify-center">
+            <Image
+              src={improbableLogo}
+              alt="IMPROBABLE"
+              class="h-12 sm:h-16 lg:h-20 w-auto object-contain"
+            />
+          </div>
+
+          {/* Maven Logo */}
+          <div class="flex items-center justify-center">
+            <Image
+              src={mavenLogo}
+              alt="Maven"
+              class="h-12 sm:h-16 lg:h-20 w-auto object-contain"
+            />
+          </div>
+
+          {/* QuantumBlack AI by McKinsey Logo */}
+          <div class="flex items-center justify-center">
+            <Image
+              src={quantumblackLogo}
+              alt="QuantumBlack AI by McKinsey"
+              class="h-12 sm:h-16 lg:h-20 w-auto object-contain"
+            />
+          </div>
+
+          {/* quantco Logo - Current Work (arrow points here) */}
+          <div class="flex items-center justify-center relative">
+            {/* Current Work Indicator - absolutely positioned above quantco logo */}
+            <div class="absolute -top-8 sm:-top-10 md:-top-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+              <div class="inline-flex items-center">
+                <p class="font-square-peg text-[#FC6B55] text-[40px]">
+                  i work here now
+                </p>
+                {/* Curved arrow pointing right then down */}
+                <svg
+                  class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-[#FC6B55] ml-2"
+                  viewBox="0 0 40 40"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  {/* Curved path: starts going right, then curves down smoothly */}
+                  <path d="M2 20 Q20 20 20 35" />
+                  {/* Arrowhead pointing down */}
+                  <path d="M18 33 L20 36 L22 33" />
+                </svg>
+              </div>
+            </div>
+            <Image
+              src={quantcoLogo}
+              alt="quantco"
+              class="h-12 sm:h-16 lg:h-20 w-auto object-contain"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Bottom Section: Work Experience Cards */}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      {/* QuantumBlack - Technical UX Designer */}
+      <ExperienceCard
+        backgroundImage={kedroBackground}
+        logoImage={quantumblackLogo}
+        logoImageAlt="QuantumBlack"
+        jobRole="Technical UX Designer"
+        companyName="QuantumBlack"
+        description={quantumblackProject?.data.title || ""}
+        alt="Kedro framework interface background"
+        href="/work/quantumblack?from=work"
+      />
+
+      {/* Maven - Lead Designer */}
+      <ExperienceCard
+        backgroundImage={mavenBackground}
+        logoImage={mavenLogo}
+        logoImageAlt="Maven"
+        jobRole="Lead Designer"
+        companyName="Maven"
+        description={mavenProject?.data.title || ""}
+        alt="Maven trading interface background"
+        href="/work/maven?from=work"
+      />
+
+      {/* Improbable - UX Engineer */}
+      <ExperienceCard
+        backgroundImage={improbableBackground}
+        logoImage={improbableLogo}
+        logoImageAlt="Improbable"
+        jobRole="UX Engineer"
+        companyName="Improbable"
+        description={improbableProject?.data.title || ""}
+        alt="Improbable abstract geometric background"
+        href="/work/improbable?from=work"
+      />
+    </div>
+  </div>
+</section>

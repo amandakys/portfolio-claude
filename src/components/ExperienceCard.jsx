@@ -1,14 +1,16 @@
 /**
- * ExperienceCard - A reusable experience card component with background image, overlay, and centered content
+ * ExperienceCard - A reusable experience card component matching project card style
  *
  * @param {string} backgroundImage - URL or path to the background image
  * @param {string} logoImage - URL or path to the company logo image
  * @param {string} logoImageAlt - Alt text for the logo image (for accessibility)
- * @param {string} jobRole - Job role text (will be displayed in uppercase)
- * @param {string} companyName - Company name (used for aria-label only, e.g. "Kedro")
+ * @param {string} jobRole - Job role text
+ * @param {string} companyName - Company name
+ * @param {string} description - Brief description of the role
  * @param {string} alt - Alt text for the background image (for accessibility)
  * @param {string} className - Additional CSS classes
  * @param {string} href - Optional link URL (makes the card clickable)
+ * @param {Array} tags - Optional array of skill/technology tags
  */
 function ExperienceCard({
   backgroundImage,
@@ -16,98 +18,66 @@ function ExperienceCard({
   logoImageAlt,
   jobRole,
   companyName = '',
+  description = '',
   alt = '',
   className = '',
-  href
+  href,
+  tags = []
 }) {
-  const cardContent = (
-    <div 
-      className={`
-        relative 
-        w-full 
-        aspect-square 
-        overflow-hidden 
-        group
-        ${className}
-      `}
+  const CardWrapper = href ? 'a' : 'div';
+  const wrapperProps = href ? { href } : {};
+
+  return (
+    <CardWrapper
+      {...wrapperProps}
+      className={`group block bg-white/10 hover:bg-white/20 backdrop-blur-sm overflow-hidden transition-all duration-300 ${className}`}
     >
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 w-full h-full"
-        aria-hidden="true"
-      >
-        <img 
+      {/* Image area with background + logo overlay */}
+      <div className="relative aspect-video overflow-hidden">
+        <img
           src={backgroundImage}
-          alt={alt || `${logoImageAlt} - ${jobRole}`}
-          className="w-full h-full object-cover"
+          alt={alt || `${companyName} background`}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-      </div>
-
-      {/* Overlay - darkens on hover */}
-      <div 
-        className="
-          absolute 
-          inset-0 
-          bg-black/50 
-          group-hover:bg-black/70 
-          transition-colors 
-          duration-300 
-          ease-in-out
-        "
-        aria-hidden="true"
-      />
-
-      {/* Content - Company Logo and Job Role */}
-      <div
-        className="
-          absolute
-          inset-0
-          flex
-          flex-col
-          items-center
-          justify-center
-          text-white
-          z-10
-          px-4
-        "
-      >
-        {/* Company Logo Image */}
-        <div className="flex items-center justify-center mb-3 sm:mb-4 w-full max-w-[300px] h-[60px]">
+        {/* Dark overlay for better logo visibility */}
+        <div
+          className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"
+          aria-hidden="true"
+        />
+        {/* Centered logo */}
+        <div className="absolute inset-0 flex items-center justify-center p-4">
           <img
             src={logoImage}
             alt={logoImageAlt}
-            className="block max-h-[60px] max-w-full w-auto h-auto object-contain object-center"
+            className="max-h-[50px] max-w-[70%] w-auto h-auto object-contain"
           />
         </div>
-
-        {/* Job Role */}
-        <p className="font-job-role text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-wide text-center">
-          {jobRole}
-        </p>
       </div>
-    </div>
-  );
 
-  // If href is provided, wrap in a link
-  if (href) {
-    return (
-      <a 
-        href={href}
-        className="block focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900"
-        aria-label={companyName ? `${companyName} - ${jobRole}` : `${logoImageAlt} - ${jobRole}`}
-      >
-        {cardContent}
-      </a>
-    );
-  }
-
-  return (
-    <article 
-      className="block focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 rounded-lg"
-      aria-label={companyName ? `${companyName} - ${jobRole}` : `${logoImageAlt} - ${jobRole}`}
-    >
-      {cardContent}
-    </article>
+      {/* Content section */}
+      <div className="p-6">
+        <h3 className="font-heading text-xl text-white mb-2 group-hover:text-[#FAE397] transition-colors">
+          {jobRole}
+        </h3>
+        {description && (
+          <p className="font-body text-white/70 text-sm line-clamp-2">
+            {description}
+          </p>
+        )}
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {tags.map((tag, tagIndex) => (
+              <span
+                key={tagIndex}
+                className="font-body text-xs px-2 py-1 bg-white/10 text-white/60 rounded"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </CardWrapper>
   );
 }
 

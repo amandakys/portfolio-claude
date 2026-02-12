@@ -36,8 +36,8 @@ function Work() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-16">
               {/* IMPROBABLE Logo */}
               <div className="flex items-center justify-center">
-                <img 
-                  src={improbableLogo} 
+                <img
+                  src={improbableLogo.src}
                   alt="IMPROBABLE" 
                   className="h-12 sm:h-16 lg:h-20 w-auto object-contain"
                 />
@@ -45,8 +45,8 @@ function Work() {
 
               {/* Maven Logo */}
               <div className="flex items-center justify-center">
-                <img 
-                  src={mavenLogo} 
+                <img
+                  src={mavenLogo.src}
                   alt="Maven" 
                   className="h-12 sm:h-16 lg:h-20 w-auto object-contain"
                 />
@@ -54,8 +54,8 @@ function Work() {
 
               {/* QuantumBlack AI by McKinsey Logo */}
               <div className="flex items-center justify-center">
-                <img 
-                  src={quantumblackLogo} 
+                <img
+                  src={quantumblackLogo.src}
                   alt="QuantumBlack AI by McKinsey" 
                   className="h-12 sm:h-16 lg:h-20 w-auto object-contain"
                 />
@@ -87,8 +87,8 @@ function Work() {
                     </svg>
                   </div>
                 </div>
-                <img 
-                  src={quantcoLogo} 
+                <img
+                  src={quantcoLogo.src}
                   alt="quantco" 
                   className="h-12 sm:h-16 lg:h-20 w-auto object-contain"
                 />
@@ -99,34 +99,40 @@ function Work() {
 
         {/* Bottom Section: Work Experience Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {/* Kedro - Technical UX Designer */}
+          {/* QuantumBlack - Technical UX Designer */}
           <ExperienceCard
-            backgroundImage={kedroBackground}
-            logoImage={kedroLogo}
-            logoImageAlt="Kedro"
+            backgroundImage={kedroBackground.src}
+            logoImage={quantumblackLogo.src}
+            logoImageAlt="QuantumBlack"
             jobRole="Technical UX Designer"
-            companyName="Kedro"
+            companyName="QuantumBlack"
+            description="Designing developer experience for Kedro, an open-source data pipeline framework"
             alt="Kedro framework interface background"
+            href="/work/quantumblack"
           />
 
           {/* Maven - Lead Designer */}
           <ExperienceCard
-            backgroundImage={mavenBackground}
-            logoImage={mavenLogo}
+            backgroundImage={mavenBackground.src}
+            logoImage={mavenLogo.src}
             logoImageAlt="Maven"
             jobRole="Lead Designer"
             companyName="Maven"
+            description="Designing an internal trading platform for a proprietary trading firm"
             alt="Maven trading interface background"
+            href="/work/maven"
           />
 
           {/* Improbable - UX Engineer */}
           <ExperienceCard
-            backgroundImage={improbableBackground}
-            logoImage={improbableLogo}
+            backgroundImage={improbableBackground.src}
+            logoImage={improbableLogo.src}
             logoImageAlt="Improbable"
             jobRole="UX Engineer"
             companyName="Improbable"
+            description="Building developer tools and SPAs for game development platform"
             alt="Improbable abstract geometric background"
+            href="/work/improbable"
           />
         </div>
       </div>

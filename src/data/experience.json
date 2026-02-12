@@ -1,0 +1,20 @@
+[
+  {
+    "companyName": "Kedro",
+    "jobRole": "Technical UX Designer",
+    "backgroundImagePath": "kedro-background.png",
+    "logoImagePath": "quantumblack-logo.png"
+  },
+  {
+    "companyName": "Maven",
+    "jobRole": "Lead Designer",
+    "backgroundImagePath": "maven-background.png",
+    "logoImagePath": "maven-logo.png"
+  },
+  {
+    "companyName": "Improbable",
+    "jobRole": "UX Engineer",
+    "backgroundImagePath": "improbable-background.png",
+    "logoImagePath": "improbable-logo.png"
+  }
+]
