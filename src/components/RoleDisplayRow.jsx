@@ -11,13 +11,13 @@ function RoleDisplayRow({ roles = [], className = '' }) {
 
   return (
     <div
-      className={`flex flex-col sm:flex-row  sm:gap-[.2rem] md: gap-[.4rem] lg:gap-[.6rem] 2xl:gap-[.8rem] items-stretch justify-center ${className}`}
+      className={`flex flex-col md:flex-row gap-4 md:gap-[.2rem] md:gap-[.4rem] lg:gap-[.6rem] 2xl:gap-[.8rem] items-stretch justify-center ${className}`}
       role="list"
       aria-label="Role displays"
     >
       {displayRoles.map((role, index) => (
-        <div key={index} className="flex-1 min-w-0 max-w-2xl sm:max-w-none" role="listitem">
-          <RoleDisplay {...role} fullWidth contentClassName={index === 0 ? '!pl-14 sm:!pl-16' : ''} />
+        <div key={index} className="flex-1 min-w-0 w-full md:max-w-none" role="listitem">
+          <RoleDisplay {...role} fullWidth contentClassName={index === 0 ? 'md:!pl-14 md:!pl-16' : ''} />
         </div>
       ))}
     </div>

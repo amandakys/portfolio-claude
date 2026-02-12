@@ -63,30 +63,25 @@ function Hero() {
         <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 max-w-7xl mx-auto">
           {/* Left Side - Text Content */}
           <div className="flex-1 lg:w-1/2 space-y-2 sm:space-y-3 text-left">
-            <h1 className="font-ebrula text-5xl sm:text-6xl lg:text-7xl xl:text-8xl text-[#FC6B55] leading-tight">
+            <h1 className="font-ebrula text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-[#FC6B55] leading-tight">
               Hi, I'm Amanda
             </h1>
             
-            <div className="font-square-peg text-white text-6xl leading-tight space-y-1">
+            <div className="font-square-peg text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight space-y-1">
               <p>and I have multiple personalities.</p>
               <p>some call it "interdisciplinary"</p>
               <p>
-                I call it <span className="relative inline-block">Living in the Multiverse<span className="absolute left-0 right-0 border-b-4 border-[#F0534E]" style={{ bottom: '0.5em' }}></span></span>
+                I call it <span className="relative inline-block">Living in the Multiverse<span className="absolute left-0 right-0 border-b-2 sm:border-b-4 border-[#F0534E]" style={{ bottom: '0.5em' }}></span></span>
               </p>
-              <p className="text-[#F0534E] inline-block ml-20 pl-20 rotate-[-5deg]">Problem-solving</p>
+              <p className="text-[#F0534E] inline-block ml-8 sm:ml-12 md:ml-16 lg:ml-20 pl-8 sm:pl-12 md:pl-16 lg:pl-20 rotate-[-5deg]">Problem-solving</p>
             </div>
           </div>
 
           {/* Right Side - Avatar Image */}
           <div className="flex-1 lg:w-1/2 flex justify-center items-center relative z-20">
             <div
-              className="relative border-4 border-white/20 shadow-2xl"
-              style={{
-                width: '24rem',
-                height: '24rem',
-                borderRadius: '50%',
-                overflow: 'hidden'
-              }}
+              className="relative border-4 border-white/20 shadow-2xl w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 overflow-hidden"
+              style={{ borderRadius: '50%' }}
             >
               {avatars.map((avatar, index) => (
                 <img
@@ -104,8 +99,8 @@ function Hero() {
       </div>
 
       {/* Bottom Role Cards Section - wider than viewport so left/right card corners are clipped */}
-      <div className="relative z-10 lg:mt-10 pb-8 sm:pb-12 px-0 w-full">
-        <div className="relative translate-x-[-0.5%] w-[100%] min-w-[106%]">
+      <div className="relative z-10 mt-0 lg:mt-0 pt-10 md:pt-16 lg:pt-20 pb-8 md:pb-16 lg:pb-24 px-0 w-full overflow-hidden">
+        <div className="relative md:translate-x-[-0.5%] w-full md:min-w-[106%]">
           <RoleDisplayRow roles={roles} />
         </div>
       </div>

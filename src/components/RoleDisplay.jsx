@@ -37,8 +37,8 @@ function RoleDisplay({
         relative
         w-full
         ${fullWidth ? '' : 'max-w-2xl'}
-        h-[400px]
-        rotate-[10deg]
+        h-[280px] md:h-[320px] md:h-[360px] lg:h-[400px]
+        md:rotate-[10deg]
         origin-top
         overflow-hidden
         transition-transform duration-200 ease-out
@@ -70,14 +70,14 @@ function RoleDisplay({
       )}
 
       {/* Content – counter-rotated so text stays level */}
-      <div className={`relative z-10 flex flex-col justify-center items-start text-left pt-6 pr-6 pb-6 pl-10 sm:pt-8 sm:pr-8 sm:pb-8 sm:pl-12 -rotate-[10deg] ${contentClassName}`}>
+      <div className={`relative z-10 flex flex-col justify-center items-start text-left p-6 md:pt-8 md:pr-8 md:pb-8 md:pl-12 md:-rotate-[10deg] ${contentClassName}`}>
         {title && (
-          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4 text-left">
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4 text-left">
             {title}
           </h2>
         )}
         {bodyLines.length > 0 && (
-          <div className="text-base sm:text-lg text-white leading-relaxed space-y-1 text-left" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <div className="text-base md:text-lg text-white leading-relaxed space-y-1 text-left" style={{ fontFamily: "'DM Sans', sans-serif" }}>
             {bodyLines.map((line, index) => (
               <p key={index} className="block text-left">
                 {typeof line === 'string' ? line : line}

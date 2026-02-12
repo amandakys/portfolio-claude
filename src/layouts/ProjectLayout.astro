@@ -42,19 +42,44 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     {isProtected && <PasswordProtection />}
     <div class="flex flex-col lg:flex-row lg:h-screen">
       <!-- Left Side - Fixed on desktop, top on mobile -->
-      <aside class="w-full lg:w-[30%] bg-[#19224D] flex flex-col justify-between p-8 sm:p-12 lg:p-16 shrink-0 lg:overflow-y-auto">
-        <div>
+      <aside class="w-full lg:w-[30%] bg-[#19224D] flex flex-col justify-between pt-0 px-8 pb-8 sm:px-12 sm:pb-12 lg:p-16 shrink-0 lg:overflow-y-auto relative">
+        <!-- Top row: Back link and hamburger menu - sticky on mobile -->
+        <div
+          id="project-top-bar"
+          class="lg:static fixed top-0 left-0 right-0 z-40 flex justify-between items-center px-4 py-2 sm:px-6 sm:py-3 lg:p-0 lg:mb-8 transition-all duration-300"
+        >
           <!-- Back link -->
           <a
             id="back-link"
             href={isWorkProject ? "/#work" : "/projects"}
-            class="inline-flex items-center gap-2 font-job-role text-white/60 tracking-wide text-sm hover:text-white transition-colors mb-6 lg:mb-8"
+            class="inline-flex items-center gap-2 font-job-role text-white/60 tracking-wide text-sm hover:text-white transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
             <span id="back-label">{isWorkProject ? "Work" : "Projects"}</span>
           </a>
+
+          <!-- Mobile Hamburger Button -->
+          <button
+            id="project-menu-toggle"
+            class="lg:hidden p-2 text-white hover:opacity-80 transition-opacity"
+            aria-label="Toggle menu"
+            aria-expanded="false"
+          >
+            <svg id="project-hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="project-close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Spacer for fixed header on mobile -->
+        <div class="h-10 sm:h-12 lg:hidden"></div>
+
+        <div>
 
           <!-- Title -->
           <h1 class="font-ebrula text-[80px] text-[#FC6B55] leading-tight">
@@ -109,8 +134,8 @@ const tocHeadings = headings.filter(h => h.depth === 2);
 
       <!-- Right Side - Scrollable -->
       <main id="main-content" class="flex-1 bg-[#FEFAEC] lg:overflow-y-auto scroll-smooth">
-        <!-- Navigation -->
-        <nav class="sticky top-0 bg-[#FEFAEC]/80 backdrop-blur-sm z-10 flex justify-end gap-4 sm:gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8">
+        <!-- Navigation - Desktop only -->
+        <nav class="sticky top-0 bg-[#FEFAEC]/80 backdrop-blur-sm z-10 hidden lg:flex justify-end gap-4 sm:gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8">
           <a
             href="/about"
             class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
@@ -146,6 +171,42 @@ const tocHeadings = headings.filter(h => h.depth === 2);
           <slot />
         </article>
       </main>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div
+      id="project-mobile-menu"
+      class="fixed inset-0 z-50 bg-[#19224D] flex-col items-center justify-center gap-8 transform translate-x-full transition-transform duration-300 ease-in-out hidden lg:hidden"
+    >
+      <!-- Close button in top right -->
+      <button
+        id="project-menu-close"
+        class="absolute top-6 right-6 p-2 text-white hover:opacity-80 transition-opacity"
+        aria-label="Close menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <a
+        href="/about"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        About
+      </a>
+      <a
+        href="/#work"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        Work
+      </a>
+      <a
+        href="/projects"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        Projects
+      </a>
     </div>
   </body>
 </html>
@@ -190,7 +251,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
 
   // Handle TOC anchor clicks for scrollable container
   (function() {
-    const tocLinks = document.querySelectorAll('nav a[href^="#"]');
+    const tocLinks = document.querySelectorAll('aside nav a[href^="#"]');
     const mainContent = document.getElementById('main-content');
 
     tocLinks.forEach(function(link) {
@@ -211,6 +272,62 @@ const tocHeadings = headings.filter(h => h.depth === 2);
           });
         }
       });
+    });
+  })();
+
+  // Sticky top bar background on scroll
+  (function() {
+    const topBar = document.getElementById('project-top-bar');
+
+    function updateTopBarBackground() {
+      if (window.scrollY > 20) {
+        topBar?.classList.add('bg-[#19224D]/90', 'backdrop-blur-md');
+      } else {
+        topBar?.classList.remove('bg-[#19224D]/90', 'backdrop-blur-md');
+      }
+    }
+
+    window.addEventListener('scroll', updateTopBarBackground);
+    updateTopBarBackground();
+  })();
+
+  // Mobile menu toggle
+  (function() {
+    const menuToggle = document.getElementById('project-menu-toggle');
+    const menuClose = document.getElementById('project-menu-close');
+    const mobileMenu = document.getElementById('project-mobile-menu');
+    const hamburgerIcon = document.getElementById('project-hamburger-icon');
+    const closeIcon = document.getElementById('project-close-icon');
+
+    function openMenu() {
+      mobileMenu?.classList.remove('hidden');
+      mobileMenu?.classList.add('flex');
+      mobileMenu?.offsetHeight; // Trigger reflow
+      mobileMenu?.classList.remove('translate-x-full');
+      mobileMenu?.classList.add('translate-x-0');
+      hamburgerIcon?.classList.add('hidden');
+      closeIcon?.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      mobileMenu?.classList.remove('translate-x-0');
+      mobileMenu?.classList.add('translate-x-full');
+      hamburgerIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+      document.body.style.overflow = '';
+      setTimeout(function() {
+        mobileMenu?.classList.add('hidden');
+        mobileMenu?.classList.remove('flex');
+      }, 300);
+    }
+
+    menuToggle?.addEventListener('click', openMenu);
+    menuClose?.addEventListener('click', closeMenu);
+
+    // Close menu when clicking a link
+    mobileMenu?.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', closeMenu);
     });
   })();
 </script>

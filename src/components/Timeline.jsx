@@ -157,10 +157,10 @@ function Timeline() {
   };
 
   return (
-    <div ref={containerRef} className="relative min-h-[200vh] pt-20 pb-40 overflow-visible">
-      {/* SVG Timeline */}
+    <div ref={containerRef} className="relative pt-8 md:pt-20 pb-20 md:pb-40 md:min-h-[200vh] overflow-visible">
+      {/* SVG Timeline - left on mobile, center on desktop */}
       <svg
-        className="absolute left-1/2 -translate-x-1/2 w-40"
+        className="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-8 md:w-40"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
         style={{ height: '110%', top: '0', overflow: 'visible' }}
@@ -209,7 +209,38 @@ function Timeline() {
         />
       </svg>
 
-      {/* Milestones */}
+      {/* Milestones - Mobile: to the right of line, Desktop: alternating */}
+      <div className="md:hidden flex flex-col gap-8 pl-12 pr-4">
+        {milestones.map((milestone, index) => {
+          return (
+            <div
+              key={index}
+              className="transition-all duration-700 opacity-100"
+            >
+              <div className="group/tag relative">
+                <div className="bg-white/10 backdrop-blur-sm px-5 py-3 cursor-pointer transition-all duration-300 group-hover/tag:bg-white/20 relative z-10">
+                  <h3 className="font-heading text-white text-base leading-tight">
+                    {milestone.title}
+                  </h3>
+                  <p className="font-body text-[#FAE397] text-sm mt-1">
+                    {milestone.description}
+                  </p>
+                </div>
+
+                {milestone.annotation && (
+                  <div className="mt-2 transition-opacity duration-500 opacity-100">
+                    <p className="font-square-peg text-[#FAE397] text-2xl leading-snug">
+                      {milestone.annotation}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Milestones */}
       {milestones.map((milestone, index) => {
         const topPercent = getMilestonePosition(index);
         const isVisible = scrollProgress > (topPercent / 100) * 0.8;
@@ -219,7 +250,7 @@ function Timeline() {
         return (
           <div
             key={index}
-            className={`absolute transition-all duration-700 ${
+            className={`absolute transition-all duration-700 hidden md:block ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
             style={{

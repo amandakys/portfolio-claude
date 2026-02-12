@@ -65,29 +65,40 @@ const improbableProject = projects.find(p => p.slug === 'improbable');
 
           {/* quantco Logo - Current Work (arrow points here) */}
           <div class="flex items-center justify-center relative">
-            {/* Current Work Indicator - absolutely positioned above quantco logo */}
-            <div class="absolute -top-8 sm:-top-10 md:-top-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-              <div class="inline-flex items-center">
-                <p class="font-square-peg text-[#FC6B55] text-[40px]">
-                  i work here now
-                </p>
-                {/* Curved arrow pointing right then down */}
-                <svg
-                  class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-[#FC6B55] ml-2"
-                  viewBox="0 0 40 40"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  {/* Curved path: starts going right, then curves down smoothly */}
-                  <path d="M2 20 Q20 20 20 35" />
-                  {/* Arrowhead pointing down */}
-                  <path d="M18 33 L20 36 L22 33" />
-                </svg>
-              </div>
+            {/* Current Work Indicator - left on mobile, above on larger screens */}
+            <div class="sm:absolute sm:-top-10 md:-top-12 sm:left-1/2 sm:transform sm:-translate-x-[70%] whitespace-nowrap flex items-center mr-2 sm:mr-0">
+              <p class="font-square-peg text-[#FC6B55] text-[28px] sm:text-[40px]">
+                i work here now
+              </p>
+              {/* Arrow pointing right on mobile, curved down on larger screens */}
+              <svg
+                class="hidden sm:block w-10 h-10 md:w-12 md:h-12 text-[#FC6B55] ml-2"
+                viewBox="0 0 40 40"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                {/* Curved path: starts going right, then curves down smoothly */}
+                <path d="M2 20 Q20 20 20 35" />
+                {/* Arrowhead pointing down */}
+                <path d="M18 33 L20 36 L22 33" />
+              </svg>
+              {/* Arrow pointing right on mobile */}
+              <svg
+                class="sm:hidden w-6 h-6 text-[#FC6B55] ml-1"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
             </div>
             <Image
               src={quantcoLogo}

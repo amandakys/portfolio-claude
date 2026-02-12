@@ -1,8 +1,8 @@
 ---
-title: Building developer tools and SPAs for game development platform
+title: Building developer tools and SPAs
 date: "2019-12-10"
 thumbnail: ./improbable-background.png
-description: "Worked across Games and Defence teams to design and build customer-facing web applications and a military decision-support tool, translating complex technical systems into usable interfaces"
+description: "Worked across Games and Defence teams to design and build customer-facing web applications for a game development platform and a military decision-support tool, translating complex technical systems into usable interfaces"
 casestudy: true
 showOnHomepage: false
 tags: ["design", "UX", "engineering"]
