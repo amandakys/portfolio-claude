@@ -182,7 +182,7 @@ function Timeline() {
   };
 
   return (
-    <div ref={containerRef} className="relative pt-8 md:pt-20 pb-[25vh] md:pb-40 md:min-h-[200vh] overflow-visible">
+    <div ref={containerRef} className="relative pt-8 md:pt-20 pb-20 md:pb-40 md:min-h-[200vh] overflow-visible">
       {/* SVG Timeline - left on mobile, center on desktop */}
       <svg
         className="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-8 md:w-40"
@@ -237,11 +237,9 @@ function Timeline() {
       {/* Milestones - Mobile: to the right of line, Desktop: alternating */}
       <div className="md:hidden flex flex-col gap-8 pl-12 pr-4">
         {milestones.map((milestone, index) => {
-          const isActive = activeMilestone === index;
           return (
             <div
               key={index}
-              ref={el => milestoneRefs.current[index] = el}
               className="transition-all duration-700 opacity-100"
             >
               <div className="group/tag relative">
@@ -255,7 +253,7 @@ function Timeline() {
                 </div>
 
                 {milestone.annotation && (
-                  <div className={`mt-2 transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className="mt-2 transition-opacity duration-500 opacity-100">
                     <p className="font-square-peg text-[#FAE397] text-2xl leading-snug">
                       {milestone.annotation}
                     </p>
