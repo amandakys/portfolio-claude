@@ -31,6 +31,10 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Preload custom fonts to reduce FOUT -->
+    <link rel="preload" href="/fonts/EbrulaVintageDemo-Regular.otf" as="font" type="font/otf" crossorigin />
+    <link rel="preload" href="/fonts/Roslindale-DisplayCondensedBold-Testing.otf" as="font" type="font/otf" crossorigin />
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
