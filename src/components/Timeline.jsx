@@ -51,6 +51,7 @@ function Timeline() {
   const [glowPosition, setGlowPosition] = useState({ x: 50, y: 0 });
   const containerRef = useRef(null);
   const pathRef = useRef(null);
+  const milestoneRefs = useRef([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,24 +73,48 @@ function Timeline() {
       let closestIndex = -1;
       let closestDistance = Infinity;
 
-      milestones.forEach((_, index) => {
-        const milestonePercent = 5 + (index / (milestones.length - 1)) * 80;
-        const milestoneY = rect.top + (milestonePercent / 100) * elementHeight;
-        const distance = Math.abs(milestoneY - viewportCenter);
+      // Check if we're on mobile (md breakpoint is 768px)
+      const isMobile = window.innerWidth < 768;
 
-        if (distance < closestDistance && distance < windowHeight * 0.3) {
-          closestDistance = distance;
-          closestIndex = index;
-        }
-      });
+      if (isMobile && milestoneRefs.current.length > 0) {
+        // Use actual DOM positions for mobile
+        milestoneRefs.current.forEach((ref, index) => {
+          if (ref) {
+            const milestoneRect = ref.getBoundingClientRect();
+            const milestoneCenter = milestoneRect.top + milestoneRect.height / 2;
+            const distance = Math.abs(milestoneCenter - viewportCenter);
+
+            if (distance < closestDistance && distance < windowHeight * 0.4) {
+              closestDistance = distance;
+              closestIndex = index;
+            }
+          }
+        });
+      } else {
+        // Use calculated positions for desktop
+        milestones.forEach((_, index) => {
+          const milestonePercent = 5 + (index / (milestones.length - 1)) * 80;
+          const milestoneY = rect.top + (milestonePercent / 100) * elementHeight;
+          const distance = Math.abs(milestoneY - viewportCenter);
+
+          if (distance < closestDistance && distance < windowHeight * 0.3) {
+            closestDistance = distance;
+            closestIndex = index;
+          }
+        });
+      }
 
       setActiveMilestone(closestIndex);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
     handleScroll(); // Initial call
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   // Update glow position along the path
@@ -157,7 +182,7 @@ function Timeline() {
   };
 
   return (
-    <div ref={containerRef} className="relative pt-8 md:pt-20 pb-20 md:pb-40 md:min-h-[200vh] overflow-visible">
+    <div ref={containerRef} className="relative pt-8 md:pt-20 pb-[25vh] md:pb-40 md:min-h-[200vh] overflow-visible">
       {/* SVG Timeline - left on mobile, center on desktop */}
       <svg
         className="absolute left-4 md:left-1/2 md:-translate-x-1/2 w-8 md:w-40"
@@ -212,9 +237,11 @@ function Timeline() {
       {/* Milestones - Mobile: to the right of line, Desktop: alternating */}
       <div className="md:hidden flex flex-col gap-8 pl-12 pr-4">
         {milestones.map((milestone, index) => {
+          const isActive = activeMilestone === index;
           return (
             <div
               key={index}
+              ref={el => milestoneRefs.current[index] = el}
               className="transition-all duration-700 opacity-100"
             >
               <div className="group/tag relative">
@@ -228,7 +255,7 @@ function Timeline() {
                 </div>
 
                 {milestone.annotation && (
-                  <div className="mt-2 transition-opacity duration-500 opacity-100">
+                  <div className={`mt-2 transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>
                     <p className="font-square-peg text-[#FAE397] text-2xl leading-snug">
                       {milestone.annotation}
                     </p>

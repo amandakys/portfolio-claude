@@ -10,7 +10,7 @@ tags: ["coding", "design"]
 
 ## The Context 
 
-It's been 6 years since I last refreshed my portfolio. My [previous set up](portfolio) was pretty good, and I'd just add new markdown entries whenever I got a new job. But since I'd used a template for my last site, I'd always wanted to build a more customised website, so I could add a few more personal touches. But alas, I never did find the time. 
+It's been 6 years since I last refreshed my portfolio. My [previous set up](/projects/portfolio) was pretty good, and I'd just add new markdown entries whenever I got a new job. But since I'd used a template for my last site, I'd always wanted to build a more customised website, so I could add a few more personal touches. But alas, I never did find the time. 
 
 With vibe-coding gaining traction, the market was flooded with tools and I could barely keep up. I thought my portfolio website was a low stakes project to experiment with these tools, compare performance and learn how to effectively use them. 
 

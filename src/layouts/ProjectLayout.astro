@@ -23,7 +23,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="overflow-x-hidden">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -38,7 +38,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
 
     <title>{title} | Amanda Koh</title>
   </head>
-  <body class="min-h-screen lg:overflow-hidden">
+  <body class="min-h-screen lg:overflow-hidden overflow-x-hidden">
     {isProtected && <PasswordProtection />}
     <div class="flex flex-col lg:flex-row lg:h-screen">
       <!-- Left Side - Fixed on desktop, top on mobile -->
@@ -82,7 +82,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
         <div>
 
           <!-- Title -->
-          <h1 class="font-ebrula text-[80px] text-[#FC6B55] leading-tight">
+          <h1 class="font-ebrula text-5xl sm:text-6xl md:text-7xl lg:text-[80px] text-[#FC6B55] leading-tight">
             {title}
           </h1>
 

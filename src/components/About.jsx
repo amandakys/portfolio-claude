@@ -41,40 +41,73 @@ function About() {
       </section>
 
       {/* Say hi. Section */}
-      <section className="relative bg-[#F0534E]/30  pt-0 pb-6">
+      <section className="relative bg-[#F0534E]/30 pt-4 sm:pt-0 pb-6">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 lg:gap-8">
+          {/* Mobile/Tablet layout: 2 rows (up to lg) */}
+          <div className="flex flex-col gap-2 lg:hidden">
+            {/* Row 1: Say hi. + LinkedIn */}
+            <div className="flex flex-row items-end justify-between">
+              <h2 className="font-ebrula text-4xl sm:text-6xl md:text-7xl text-white leading-tight">
+                Say hi.
+              </h2>
+              <a
+                href="https://www.linkedin.com/in/amandakys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block hover:opacity-80 transition-opacity"
+                aria-label="Visit Amanda's LinkedIn profile"
+              >
+                <img
+                  src={linkedinLogo.src}
+                  alt="LinkedIn"
+                  className="w-10 h-10 sm:w-12 sm:h-12"
+                />
+              </a>
+            </div>
+            {/* Row 2: Body text */}
+            <div className="space-y-1">
+              <p className="font-body text-white text-sm sm:text-base md:text-lg leading-relaxed">
+                especially for AR/VR projects
+              </p>
+              <p className="font-body text-white text-sm sm:text-base md:text-lg leading-relaxed">
+                but also, product strategy and end-to-end design for technical products
+              </p>
+            </div>
+          </div>
+
+          {/* Desktop layout: 1 row (lg and up) */}
+          <div className="hidden lg:flex flex-row items-end justify-between gap-8">
             {/* Say hi. Title */}
             <div className="flex-shrink-0">
-              <h2 className="font-ebrula text-6xl sm:text-7xl lg:text-8xl xl:text-9xl text-white leading-tight">
+              <h2 className="font-ebrula text-7xl lg:text-8xl xl:text-9xl text-white leading-tight">
                 Say hi.
               </h2>
             </div>
 
             {/* Text Content */}
-            <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-end gap-4 sm:gap-6 lg:gap-8 pb-4">
+            <div className="flex-1 flex flex-row items-end gap-6 lg:gap-8 pb-2 lg:pb-4">
               <div className="flex-1 space-y-2">
-                <p className="font-body text-white text-base sm:text-lg lg:text-xl leading-relaxed">
+                <p className="font-body text-white text-lg lg:text-xl leading-relaxed">
                   especially for AR/VR projects
                 </p>
-                <p className="font-body text-white text-base sm:text-lg lg:text-xl leading-relaxed">
+                <p className="font-body text-white text-lg lg:text-xl leading-relaxed">
                   but also, product strategy and end-to-end design for technical products
                 </p>
               </div>
 
               {/* LinkedIn Icon */}
               <div className="flex-shrink-0">
-                <a 
-                  href="https://www.linkedin.com/in/amandakys" 
-                  target="_blank" 
+                <a
+                  href="https://www.linkedin.com/in/amandakys"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block hover:opacity-80 transition-opacity"
                   aria-label="Visit Amanda's LinkedIn profile"
                 >
                   <img
                     src={linkedinLogo.src}
-                    alt="LinkedIn" 
-                    className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14"
+                    alt="LinkedIn"
+                    className="w-12 h-12 lg:w-14 lg:h-14"
                   />
                 </a>
               </div>
