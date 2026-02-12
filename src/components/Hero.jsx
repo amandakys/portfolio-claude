@@ -99,7 +99,7 @@ function Hero() {
       </div>
 
       {/* Bottom Role Cards Section - wider than viewport so left/right card corners are clipped */}
-      <div className="relative z-10 mt-0 lg:mt-0 pt-10 md:pt-16 lg:pt-20 pb-8 md:pb-16 lg:pb-24 px-0 w-full overflow-hidden">
+      <div className="relative z-10 mt-0 lg:mt-0 pt-10 md:pt-16 lg:pt-20 2xl:pt-24 pb-8 md:pb-16 lg:pb-24 px-0 w-full overflow-hidden">
         <div className="relative md:translate-x-[-0.5%] w-full md:min-w-[106%]">
           <RoleDisplayRow roles={roles} />
         </div>
