@@ -1,5 +1,5 @@
 ---
-title: Designing an internal trading platform
+title: Designing an internal derivatives trading platform
 date: "2021-11-09"
 thumbnail: ./maven-background.png
 description: "Joined as the first designer, leading design on a greenfield internal trading platform: a data-intensive, table-based interactive web dashboard"

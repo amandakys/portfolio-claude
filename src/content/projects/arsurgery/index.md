@@ -67,10 +67,10 @@ Finally, I settled on grouping codes based on the <b>reference frame</b> they us
 
 ### Task Characteristics 
 We identified 2 task characteristics that influenced the position of assistive information 
-1. Frequency of Information Access
+1. <b>Frequency of Information Access</b>
     - Frequent 
     - Infrequent
-2. Type of Mobility 
+2. <b>Type of Mobility </b>
     - Predictable
     - Unpredictable 
 

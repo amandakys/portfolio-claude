@@ -29,7 +29,7 @@ function About() {
               {/* About Content */}
               <div className="space-y-6 sm:space-y-8">
                 <p className="font-body text-white text-base sm:text-lg lg:text-xl leading-relaxed text-left">
-                  By day, I solve design problems in technical domains. By night, I channel unused creative energy into weird art projects. And the drums. And pottery. And whatever the latest obsession is. I'm indecisive like that.
+                  By day, I solve design problems in technical domains. By night, I channel unused creative energy into weird art projects. And the drums. And pottery. And whatever the latest obsession is.
                 </p>
                 <p className="font-body text-white text-base sm:text-lg lg:text-xl leading-relaxed text-left">
                   For a professional bio, visit the <a href="/about" className="text-[#FC6B55] hover:opacity-80 transition-opacity underline">About</a> page.

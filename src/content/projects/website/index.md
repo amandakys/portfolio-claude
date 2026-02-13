@@ -78,7 +78,6 @@ At this point, using AI to generate random images of yourself is hardly new. But
   <img src="/content/projects/website/Gemini_Generated_Image_winnczwinnczwinn.png" style="width: 32%; object-fit: cover;" alt="AI generated avatar 3" loading="lazy" />
 </div>                                                                           
 
-
 ## Outcome
 
 This website took me about 5 days to build (about 3 - 4 hrs per day), starting from the figma mockups, all the way through to fine-tuning the visuals and interactions. Writing up the new content was extra time on top of that.  
@@ -87,7 +86,7 @@ The process will certaintly be faster next time as I spent a lot of time experim
 
 I'm very pleased with the final result. I had complete control over the look and feel of the site, and I feel like I was able to create something that represented my personality. It was fun to quickly experiment with different tweaks and see them in action. This was especially good for interactive interactions. 
 
-In total, I used about $70 worth of tokens on Claude and $20 on Cursor. About $100 for a new website might seem like a lot, but paying a monthly subscription for Figma Sites, Wix, or other no-code site generators can add up quickly over the long term. This upfront cost might just last me another 6 years, and I'll only pay for hosting. 
+In total, I used about $100 worth of tokens on Claude and $20 on Cursor. $120 for a new website might seem like a lot, but paying a monthly subscription for Figma Sites, Wix, or other no-code site generators can add up quickly over the long term. This upfront cost might just last me another 6 years, and I'll only pay for my domain name. 
 
 ## Takeaways
 
