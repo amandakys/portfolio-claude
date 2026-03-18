@@ -1,5 +1,5 @@
 ---
-title: Redesigning the Kedro onboarding flow 
+title: Redesigning onboarding flows to improve Kedro adoption
 date: "2025-01-01"
 thumbnail: ./kedro-background.png
 description: "As part of ongoing efforts to improve adoption numbers for the Kedro framework, I scoped and delivered designs for a staggered onboarding CLI flow that allowed users to customise their starting project to fit their needs and skill level"

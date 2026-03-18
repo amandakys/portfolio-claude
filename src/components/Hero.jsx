@@ -67,13 +67,8 @@ function Hero() {
               Hi, I'm Amanda
             </h1>
             
-            <div className="font-square-peg text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight space-y-1">
-              <p>and I have multiple personalities.</p>
-              <p>some call it "interdisciplinary"</p>
-              <p>
-                I call it <span className="relative inline-block">Living in the Multiverse<span className="absolute left-0 right-0 border-b-2 sm:border-b-4 border-[#F0534E]" style={{ bottom: '0.5em' }}></span></span>
-              </p>
-              <p className="text-[#F0534E] inline-block ml-8 sm:ml-12 md:ml-16 lg:ml-20 pl-8 sm:pl-12 md:pl-16 lg:pl-20 rotate-[-5deg]">Problem-solving</p>
+            <div className="font-square-peg text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight">
+              <p>I turn complex systems into products people actually <span className="relative inline-block">understand<span className="absolute left-0 right-0 border-b-2 sm:border-b-4 border-[#F0534E]" style={{ bottom: '0.5em' }}></span></span> <span className="text-[#F0534E] inline-block rotate-[-5deg] ml-3 sm:ml-4">like to use</span></p>
             </div>
           </div>
 
