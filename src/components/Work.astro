@@ -38,7 +38,7 @@ const improbableProject = projects.find(p => p.slug === 'improbable');
     {/* Bottom Section: Work Experience Cards */}
     <div class="relative">
       {/* "I work here" indicator positioned above the first card */}
-      <div class="flex items-center justify-center mb-1 lg:justify-start lg:w-1/4 lg:pl-8 sm:pl-6">
+      <div class="flex items-center justify-center md:justify-start md:pl-12 mb-1 max-w-3xl mx-auto">
         <p class="font-square-peg text-[#FC6B55] text-[28px] sm:text-[40px]">
           i work here now
         </p>
@@ -56,7 +56,7 @@ const improbableProject = projects.find(p => p.slug === 'improbable');
           <path d="M18 28 L20 31 L22 28" />
         </svg>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto">
       {/* QuantCo - Founding Designer */}
       <ExperienceCard
         backgroundImage={quantcoBackground}
