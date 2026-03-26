@@ -22,31 +22,40 @@ const { currentPage = '' } = Astro.props;
     <li>
       <a
         href="/about"
-        class={`font-job-role tracking-wide text-sm sm:text-base transition-opacity ${
-          currentPage === 'about' ? 'text-[#FAE397]' : 'text-white hover:opacity-80'
+        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block ${
+          currentPage === 'about' ? 'text-[#FAE397]' : 'text-white hover:opacity-100'
         }`}
       >
         About
+        <svg class="nav-circle-svg" viewBox="0 0 120 50" preserveAspectRatio="none" aria-hidden="true">
+          <ellipse cx="60" cy="25" rx="55" ry="20" class="nav-circle-path" />
+        </svg>
       </a>
     </li>
     <li>
       <a
         href="/#work"
-        class={`font-job-role tracking-wide text-sm sm:text-base transition-opacity ${
-          currentPage === 'work' ? 'text-[#FAE397]' : 'text-white hover:opacity-80'
+        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block ${
+          currentPage === 'work' ? 'text-[#FAE397]' : 'text-white hover:opacity-100'
         }`}
       >
         Work
+        <svg class="nav-circle-svg" viewBox="0 0 120 50" preserveAspectRatio="none" aria-hidden="true">
+          <ellipse cx="60" cy="25" rx="55" ry="20" class="nav-circle-path" />
+        </svg>
       </a>
     </li>
     <li>
       <a
         href="/projects"
-        class={`font-job-role tracking-wide text-sm sm:text-base transition-opacity ${
-          currentPage === 'projects' ? 'text-[#FAE397]' : 'text-white hover:opacity-80'
+        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block ${
+          currentPage === 'projects' ? 'text-[#FAE397]' : 'text-white hover:opacity-100'
         }`}
       >
         Projects
+        <svg class="nav-circle-svg" viewBox="0 0 120 50" preserveAspectRatio="none" aria-hidden="true">
+          <ellipse cx="60" cy="25" rx="55" ry="20" class="nav-circle-path" />
+        </svg>
       </a>
     </li>
   </ul>
@@ -97,6 +106,38 @@ const { currentPage = '' } = Astro.props;
     Projects
   </a>
 </div>
+
+<style>
+  .nav-circle-link {
+    position: relative;
+    display: inline-block;
+  }
+
+  .nav-circle-svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(100% + 20px);
+    height: calc(100% + 16px);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .nav-circle-path {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 250;
+    stroke-dashoffset: 250;
+    transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .nav-circle-link:hover .nav-circle-path {
+    stroke-dashoffset: 0;
+  }
+</style>
 
 <script>
   const nav = document.getElementById('main-nav');
