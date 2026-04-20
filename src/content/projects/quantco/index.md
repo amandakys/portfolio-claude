@@ -7,7 +7,6 @@ casestudy: true
 showOnHomepage: false
 tags: ["design", "AI", "product"]
 workplace: QuantCo
-protected: true
 ---
 
 ## The Context

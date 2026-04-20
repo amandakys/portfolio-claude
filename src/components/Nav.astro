@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import logo from '../assets/logos/amanda-logo.png';
+import CvButton from './CvButton.jsx';
 
 interface Props {
   currentPage?: string;
@@ -22,41 +23,44 @@ const { currentPage = '' } = Astro.props;
     <li>
       <a
         href="/about"
-        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block ${
-          currentPage === 'about' ? 'text-[#FAE397]' : 'text-white hover:opacity-100'
+        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block text-white ${
+          currentPage === 'about' ? '' : 'hover:opacity-100'
         }`}
       >
         About
         <svg class="nav-circle-svg" viewBox="0 0 120 50" preserveAspectRatio="none" aria-hidden="true">
-          <ellipse cx="60" cy="25" rx="55" ry="20" class="nav-circle-path" />
+          <ellipse cx="60" cy="25" rx="55" ry="20" class={`nav-circle-path ${currentPage === 'about' ? 'nav-circle-active' : ''}`} />
         </svg>
       </a>
     </li>
     <li>
       <a
         href="/#work"
-        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block ${
-          currentPage === 'work' ? 'text-[#FAE397]' : 'text-white hover:opacity-100'
+        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block text-white ${
+          currentPage === 'work' ? '' : 'hover:opacity-100'
         }`}
       >
         Work
         <svg class="nav-circle-svg" viewBox="0 0 120 50" preserveAspectRatio="none" aria-hidden="true">
-          <ellipse cx="60" cy="25" rx="55" ry="20" class="nav-circle-path" />
+          <ellipse cx="60" cy="25" rx="55" ry="20" class={`nav-circle-path ${currentPage === 'work' ? 'nav-circle-active' : ''}`} />
         </svg>
       </a>
     </li>
     <li>
       <a
         href="/projects"
-        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block ${
-          currentPage === 'projects' ? 'text-[#FAE397]' : 'text-white hover:opacity-100'
+        class={`nav-circle-link font-job-role tracking-wide text-sm sm:text-base transition-opacity relative inline-block text-white ${
+          currentPage === 'projects' ? '' : 'hover:opacity-100'
         }`}
       >
         Projects
         <svg class="nav-circle-svg" viewBox="0 0 120 50" preserveAspectRatio="none" aria-hidden="true">
-          <ellipse cx="60" cy="25" rx="55" ry="20" class="nav-circle-path" />
+          <ellipse cx="60" cy="25" rx="55" ry="20" class={`nav-circle-path ${currentPage === 'projects' ? 'nav-circle-active' : ''}`} />
         </svg>
       </a>
+    </li>
+    <li>
+      <CvButton client:load />
     </li>
   </ul>
 
@@ -105,9 +109,10 @@ const { currentPage = '' } = Astro.props;
   >
     Projects
   </a>
+  <CvButton client:load />
 </div>
 
-<style>
+<style is:global>
   .nav-circle-link {
     position: relative;
     display: inline-block;
@@ -135,6 +140,10 @@ const { currentPage = '' } = Astro.props;
   }
 
   .nav-circle-link:hover .nav-circle-path {
+    stroke-dashoffset: 0;
+  }
+
+  .nav-circle-active {
     stroke-dashoffset: 0;
   }
 </style>
