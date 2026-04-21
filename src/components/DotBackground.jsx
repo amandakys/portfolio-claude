@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 const LINE_COUNT = 21
 const POINTS_PER_LINE = 120
-const BASE_COLOR = [120, 120, 120]
+const BASE_COLOR = [180, 180, 180]
 const HIGHLIGHT_COLOR = [255, 255, 255]
 const CURSOR_RADIUS = 250
 const CURSOR_PUSH = 30
@@ -28,6 +28,7 @@ function DotBackground() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let w, h
+    let cursorSuppressed = false
 
     const resize = () => {
       const parent = canvas.parentElement
@@ -42,12 +43,22 @@ function DotBackground() {
     }
 
     const handleMouseMove = (e) => {
+      if (cursorSuppressed) return
       const rect = canvas.getBoundingClientRect()
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
 
     const handleMouseLeave = () => {
       mouseRef.current = { x: -1000, y: -1000 }
+    }
+
+    const handleSuppress = () => {
+      cursorSuppressed = true
+      mouseRef.current = { x: -1000, y: -1000 }
+    }
+
+    const handleRelease = () => {
+      cursorSuppressed = false
     }
 
     // Lightning strike state
@@ -220,21 +231,27 @@ function DotBackground() {
 
     window.addEventListener('resize', resize)
     window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('dotbg:suppress', handleSuppress)
+    window.addEventListener('dotbg:release', handleRelease)
 
     return () => {
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('dotbg:suppress', handleSuppress)
+      window.removeEventListener('dotbg:release', handleRelease)
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     }
   }, [])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none z-0"
-      aria-hidden="true"
-      style={{ pointerEvents: 'all' }}
-    />
+    <div className="absolute inset-0 w-full h-full">
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        aria-hidden="true"
+        style={{ pointerEvents: 'all' }}
+      />
+    </div>
   )
 }
 

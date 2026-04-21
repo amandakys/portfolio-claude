@@ -1,7 +1,6 @@
 ---
 import ExperienceCard from './ExperienceCard.astro';
 import WorkBackground from './WorkBackground.jsx';
-import CvButton from './CvButton.jsx';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 
@@ -36,7 +35,12 @@ const improbableProject = projects.find(p => p.slug === 'improbable');
           Work
         </h2>
         <div class="mt-2 sm:mt-3">
-          <CvButton variant="deck-prompt" client:load />
+          <a
+            href="/portfolio"
+            class="font-square-peg text-[#FC6B55] text-[22px] sm:text-[28px] hover:opacity-80 transition-opacity cursor-pointer underline decoration-[#FC6B55]/40 underline-offset-4"
+          >
+            Prefer a deck? I've got you covered.
+          </a>
         </div>
       </div>
     </div>

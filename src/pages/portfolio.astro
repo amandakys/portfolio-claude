@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import PdfViewer from '../components/PdfViewer.jsx';
+import DotBackground from '../components/DotBackground.jsx';
+---
+
+<BaseLayout title="Portfolio | Amanda Koh" description="Portfolio deck of Amanda Koh">
+  <main class="min-h-screen bg-[#5A314D] relative overflow-hidden">
+    <div class="fixed top-0 left-0 w-full h-screen z-0 overflow-hidden pointer-events-none">
+      <DotBackground client:load />
+    </div>
+
+    <div
+      class="absolute inset-0 pointer-events-none z-[1]"
+      style="background: radial-gradient(ellipse at top left, rgba(25, 34, 77, 0.6) 0%, rgba(25, 34, 77, 0.3) 30%, transparent 60%)"
+      aria-hidden="true"
+    ></div>
+
+    <Nav />
+
+    <section class="relative z-10 pt-20 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
+      <PdfViewer client:load initialTab="portfolio" />
+    </section>
+  </main>
+</BaseLayout>
