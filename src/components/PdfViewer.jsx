@@ -25,10 +25,17 @@ function PdfViewer({ initialTab = 'cv' }) {
   const [cvUnlocked, setCvUnlocked] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
   const [error, setError] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && sessionStorage.getItem(CV_UNLOCK_KEY) === '1') {
       setCvUnlocked(true)
+    }
+    if (typeof navigator !== 'undefined') {
+      const ua = navigator.userAgent
+      const iOSDevice = /iPad|iPhone|iPod/.test(ua) ||
+        (ua.includes('Mac') && navigator.maxTouchPoints > 1)
+      setIsIOS(iOSDevice)
     }
   }, [])
 
@@ -193,6 +200,34 @@ function PdfViewer({ initialTab = 'cv' }) {
                 to { transform: translateX(-50%); }
               }
             `}</style>
+          </div>
+        ) : isIOS ? (
+          <div className="w-full h-full flex items-center justify-center bg-[#19224D] px-6 text-center">
+            <div className="flex flex-col items-center gap-4 max-w-sm">
+              <svg className="w-12 h-12 text-[#FC6B55]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p className="font-body text-white/80 text-sm sm:text-base">
+                PDFs render best in the native viewer on iOS.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <a
+                  href={current.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 px-5 py-3 bg-[#FC6B55] text-white font-job-role tracking-wide text-sm hover:bg-[#e55a45] transition-colors"
+                >
+                  Open {current.label}
+                </a>
+                <a
+                  href={current.path}
+                  download
+                  className="flex-1 px-5 py-3 bg-white/10 border border-white/20 text-white font-job-role tracking-wide text-sm hover:bg-white/20 transition-colors"
+                >
+                  Download
+                </a>
+              </div>
+            </div>
           </div>
         ) : (
           <iframe
