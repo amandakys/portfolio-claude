@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
-const CV_PASSWORD = 'Pl3aseL3tMe1n'
-const CV_UNLOCK_KEY = 'cv-unlocked'
+const PDF_PASSWORD = 'Pl3aseL3tMe1n'
+const PDF_UNLOCK_KEY = 'pdf-unlocked'
 
 const TABS = {
   cv: {
@@ -14,7 +14,7 @@ const TABS = {
     label: 'Portfolio',
     path: '/cv/Portfolio-AmandaKOH.pdf',
     downloadLabel: 'Download Portfolio',
-    protected: false,
+    protected: true,
   },
 }
 
@@ -22,14 +22,14 @@ const embedParams = '#pagemode=none&navpanes=0&view=FitH'
 
 function PdfViewer({ initialTab = 'cv' }) {
   const [activeTab, setActiveTab] = useState(initialTab)
-  const [cvUnlocked, setCvUnlocked] = useState(false)
+  const [unlocked, setUnlocked] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
   const [error, setError] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem(CV_UNLOCK_KEY) === '1') {
-      setCvUnlocked(true)
+    if (typeof window !== 'undefined' && sessionStorage.getItem(PDF_UNLOCK_KEY) === '1') {
+      setUnlocked(true)
     }
     if (typeof navigator !== 'undefined') {
       const ua = navigator.userAgent
@@ -41,17 +41,17 @@ function PdfViewer({ initialTab = 'cv' }) {
 
   const handleUnlock = (e) => {
     e.preventDefault()
-    if (passwordInput === CV_PASSWORD) {
-      setCvUnlocked(true)
+    if (passwordInput === PDF_PASSWORD) {
+      setUnlocked(true)
       setError(false)
-      sessionStorage.setItem(CV_UNLOCK_KEY, '1')
+      sessionStorage.setItem(PDF_UNLOCK_KEY, '1')
     } else {
       setError(true)
     }
   }
 
   const current = TABS[activeTab]
-  const isLocked = current.protected && !cvUnlocked
+  const isLocked = current.protected && !unlocked
 
   return (
     <div

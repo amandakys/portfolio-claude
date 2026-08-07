@@ -7,9 +7,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# build output
 dist
 dist-ssr
+# generated types & content cache
+.astro
+
+node_modules
 *.local
 
 # Editor directories and files
