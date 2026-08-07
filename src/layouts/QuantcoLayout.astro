@@ -1,0 +1,580 @@
+---
+/**
+ * Experimental case-study layout, currently used by the QuantCo page only.
+ * Forked from ProjectLayout.astro - if this treatment sticks, fold it back
+ * into ProjectLayout rather than adding a third layout.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import PasswordProtection from '../components/PasswordProtection.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  headings?: Heading[];
+}
+
+const { entry } = Astro.props;
+const { title, tags, description, workplace, role, thumbnail, questions, focus } = entry.data;
+const isProtected = entry.data.protected === true;
+const isWorkProject = !!workplace;
+
+// The on-page heading can differ from the listing-card title
+const heading = entry.data.pageTitle ?? title;
+
+const company = entry.data.company ?? workplace;
+const year = entry.data.year ?? new Date(entry.data.date).getFullYear().toString();
+
+// Header metadata is laid out as a labelled grid rather than a single meta
+// line, so each fact gets its own column. Empty entries are dropped.
+const focusValues = focus ?? tags;
+const facts = [
+  { label: 'Role', value: role },
+  { label: 'Company', value: company },
+  { label: 'Timeline', value: year },
+  { label: 'Focus', value: focusValues && focusValues.length > 0 ? focusValues.join(', ') : undefined },
+].filter((f) => Boolean(f.value));
+---
+
+<!doctype html>
+<html lang="en" class="overflow-x-hidden">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={entry.data.description} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Preload custom fonts to reduce FOUT -->
+    <link rel="preload" href="/fonts/EbrulaVintageDemo-Regular.otf" as="font" type="font/otf" crossorigin />
+    <link rel="preload" href="/fonts/Roslindale-DisplayCondensedBold-Testing.otf" as="font" type="font/otf" crossorigin />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Square+Peg&family=Staatliches&display=swap" rel="stylesheet" />
+
+    <title>{heading} | Amanda Koh</title>
+  </head>
+  <body class="min-h-screen overflow-x-hidden bg-[#FEFAEC]">
+    {isProtected && <PasswordProtection />}
+
+    <!-- Top bar: back link + navigation -->
+    <div
+      id="project-top-bar"
+      class="sticky top-0 z-40 bg-[#FEFAEC]/85 backdrop-blur-sm flex justify-between items-center gap-4 px-4 py-3 sm:px-6 sm:py-4 lg:px-8"
+    >
+      <!-- Back link -->
+      <a
+        id="back-link"
+        href={isWorkProject ? "/#work" : "/projects"}
+        class="inline-flex items-center gap-2 font-job-role text-[#19224D]/60 tracking-wide text-sm hover:text-[#19224D] transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span id="back-label">{isWorkProject ? "Case Studies" : "Projects"}</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden lg:flex gap-6 lg:gap-8">
+        <a
+          href="/about"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          About
+        </a>
+        <a
+          href="/#work"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          Case Studies
+        </a>
+        <a
+          href="/projects"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          Projects
+        </a>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button
+        id="project-menu-toggle"
+        class="lg:hidden p-2 text-[#19224D] hover:opacity-70 transition-opacity"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+      >
+        <svg id="project-hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="project-close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <main id="main-content" class="scroll-smooth">
+      <!-- Hero: left-aligned title, lead paragraph, then a labelled fact grid -->
+      <header class="mx-auto w-full max-w-5xl px-6 sm:px-8 pt-6 sm:pt-10 lg:pt-14 text-center">
+        <h1 class="font-ebrula text-[#FC6B55] text-5xl sm:text-6xl lg:text-7xl leading-[1.05] mx-auto max-w-4xl">
+          {heading}
+        </h1>
+
+        {description && (
+          <p class="font-body text-[#19224D]/80 text-lg sm:text-xl lg:text-2xl leading-relaxed mt-6 sm:mt-8 mx-auto max-w-3xl text-balance">
+            {description}
+          </p>
+        )}
+
+        {facts.length > 0 && (
+          <dl class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6 mt-10 sm:mt-12 pt-6 border-t border-[#19224D]/15">
+            {facts.map((fact) => (
+              <div>
+                <dt class="font-job-role text-[#19224D]/45 tracking-[0.15em] uppercase text-[0.65rem] sm:text-xs">
+                  {fact.label}
+                </dt>
+                <dd class="font-body text-[#19224D] text-sm sm:text-base mt-1.5 leading-snug">
+                  {fact.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </header>
+
+      <!-- Hero image, aligned to the header block and set inside a double
+           rule. The image itself is left flat - no vignette or shadow. -->
+      {thumbnail && (
+        <div class="mx-auto w-full max-w-5xl px-6 sm:px-8 mt-12 sm:mt-16">
+          <div class="qc-hero-frame">
+            <div class="qc-hero-inner">
+              <Image
+                src={thumbnail}
+                alt={`${heading} - project cover`}
+                widths={[960, 1920]}
+                sizes="(min-width: 1024px) 960px, 100vw"
+                class="w-full h-auto block"
+                loading="eager"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <!-- Framing questions: centred, one per line. Words are split at build
+           time so the full text is in the HTML, then rise and unblur on
+           scroll. Each word carries its own delay, accumulated across
+           questions so the three lines read in sequence. -->
+      {questions && questions.length > 0 && (
+        <section
+          id="qc-questions"
+          class="qc-questions mx-auto w-full max-w-5xl px-6 sm:px-8 mt-20 sm:mt-28 text-center"
+        >
+          <p class="qc-q-label font-job-role text-[#19224D]/45 tracking-[0.2em] uppercase text-xs sm:text-sm">
+            The Big Questions
+          </p>
+
+          <div class="mt-6 sm:mt-8">
+            {questions.map((question: string, qi: number) => {
+              const words = question.split(' ');
+              // Questions overlap: the next line starts before the previous
+              // has finished, so the sequence keeps moving.
+              const questionOffset = qi * 800;
+              return (
+                /* nowrap only from lg up - below that the questions are too
+                   long for one line and must wrap rather than overflow */
+                <p class="qc-question font-heading italic text-[#19224D] text-xl sm:text-2xl leading-[1.35] text-balance not-first:mt-2 sm:not-first:mt-3">
+                  {words.map((word, wi) => (
+                    <>
+                      <span class="qc-word">
+                        <span
+                          class="qc-word-inner"
+                          style={`--qc-delay: ${questionOffset + wi * 90}ms`}
+                        >{word}</span>
+                      </span>
+                      {wi < words.length - 1 ? ' ' : ''}
+                    </>
+                  ))}
+                </p>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <!-- Content -->
+      <article class="qc-article mx-auto w-full max-w-3xl px-6 sm:px-8 mt-20 sm:mt-28 pb-24 prose prose-lg prose-gray
+        prose-headings:font-heading prose-headings:text-[#FC6B55]
+        prose-h2:text-3xl prose-h2:sm:text-4xl prose-h2:mt-0 prose-h2:mb-8
+        prose-h3:text-xl prose-h3:sm:text-2xl prose-h3:mt-12
+        prose-h4:text-lg prose-h4:sm:text-xl prose-h4:font-semibold prose-h4:text-[#FC6B55] prose-h4:font-heading
+        prose-p:font-body prose-p:text-gray-700 prose-p:leading-relaxed
+        prose-a:text-[#FC6B55] prose-a:no-underline prose-a:hover:underline
+        prose-strong:text-[#19224D]
+        prose-img:mx-auto
+        prose-ul:font-body prose-li:text-gray-700
+      ">
+        <slot />
+      </article>
+    </main>
+
+    <!-- Mobile Menu Overlay -->
+    <div
+      id="project-mobile-menu"
+      class="fixed inset-0 z-50 bg-[#19224D] flex-col items-center justify-center gap-8 transform translate-x-full transition-transform duration-300 ease-in-out hidden lg:hidden"
+    >
+      <!-- Close button in top right -->
+      <button
+        id="project-menu-close"
+        class="absolute top-6 right-6 p-2 text-white hover:opacity-80 transition-opacity"
+        aria-label="Close menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <a
+        href="/about"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        About
+      </a>
+      <a
+        href="/#work"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        Case Studies
+      </a>
+      <a
+        href="/projects"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        Projects
+      </a>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+
+  /* --- Framing questions -------------------------------------------------
+     Each question sits on a single unbroken line from lg up. The longest is
+     ~85 characters, so the type scales with the viewport (via vw) to stay on
+     one line instead of being clamped to a fixed size that would overflow. */
+  @media (min-width: 1024px) {
+    .qc-question {
+      white-space: nowrap;
+      text-wrap: nowrap;
+      /* Italic Roslindale runs narrower than the upright, which buys more size
+         at the same line length. The vw factor is what keeps the longest
+         question on one line - raising the ceiling alone won't do it.
+         The longest question ("What does AI look like...", 87 chars) measures
+         33.3em in this face, and the column now caps at 960px (max-w-5xl less
+         the 2rem gutters) to match the hero, so anything above ~1.8rem
+         overflows. The 1.5rem ceiling leaves it filling ~83% of the line. */
+      font-size: clamp(1.05rem, 1.5vw, 1.5rem);
+    }
+  }
+
+  /* --- Hero frame --------------------------------------------------------
+     A double rule: an outer line and an inner line around the image. The
+     channel between them is unfilled, so the cream page shows through - no
+     tint, glow or shadow, just the two lines.
+
+     Both rules match the dividers elsewhere on the page (the fact-grid border
+     and the article's hr): navy at 15%, which reads as grey against cream. */
+  .qc-hero-frame {
+    padding: 0.5rem;
+    border-radius: 0.875rem;
+    border: 1px solid rgba(25, 34, 77, 0.15);
+  }
+
+  @media (min-width: 640px) {
+    .qc-hero-frame {
+      padding: 0.625rem;
+      border-radius: 1rem;
+    }
+  }
+
+  /* The second rule, and the clip for the image. Overflow hidden is safe here
+     (unlike on the questions) since nothing needs to spill outside. Sits a
+     little darker than the outer rule - it falls against the image rather
+     than cream, so a matching alpha would read lighter of the two. */
+  .qc-hero-inner {
+    border: 1px solid rgba(25, 34, 77, 0.3);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .qc-hero-shade {
+    box-shadow:
+      inset 0 3px 10px rgba(25, 34, 77, 0.55),
+      inset 0 -1px 3px rgba(25, 34, 77, 0.3),
+      inset 3px 0 8px -2px rgba(25, 34, 77, 0.4),
+      inset -3px 0 8px -2px rgba(25, 34, 77, 0.4);
+  }
+
+  /* --- Word-by-word rise -------------------------------------------------
+     Each word travels up from below while unblurring. No clipping mask: the
+     blur has to spill past the word's box to read properly, which overflow
+     hidden would cut off. */
+  .qc-word {
+    display: inline-block;
+  }
+
+  .qc-word-inner {
+    display: inline-block;
+    transform: translateY(1.4em);
+    opacity: 0;
+    filter: blur(12px);
+    will-change: transform, filter, opacity;
+  }
+
+  /* Only animate once the observer marks the section visible - without this
+     the words would finish rising before the reader scrolls to them */
+  .qc-questions[data-revealed='true'] .qc-word-inner {
+    animation: qc-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--qc-delay, 0ms);
+  }
+
+  .qc-q-label {
+    opacity: 0;
+    transition: opacity 500ms ease;
+  }
+
+  .qc-questions[data-revealed='true'] .qc-q-label {
+    opacity: 1;
+  }
+
+  @keyframes qc-rise {
+    from {
+      transform: translateY(1.4em);
+      opacity: 0;
+      filter: blur(12px);
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  /* No-JS fallback: without the observer the words would never rise, so show
+     them outright rather than leaving the section blank */
+  .qc-questions:not([data-observed='true']) .qc-word-inner {
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+
+  .qc-questions:not([data-observed='true']) .qc-q-label {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Words appear in place - the staggered reveal is dropped entirely */
+    .qc-word-inner {
+      transform: none;
+      opacity: 1;
+      filter: none;
+    }
+
+    .qc-questions[data-revealed='true'] .qc-word-inner {
+      animation: none;
+    }
+
+    .qc-q-label {
+      opacity: 1;
+      transition: none;
+    }
+  }
+
+  /* Every rule here is scoped to .qc-article: Astro bundles the global styles
+     of all layouts into one stylesheet, so unscoped `article` selectors would
+     leak onto the other project pages that still use ProjectLayout. */
+
+  /* --- Section structure -------------------------------------------------
+     Each h2 opens a numbered chapter. The counter is driven by the markdown
+     so sections can be added or reordered without touching this layout. */
+  .qc-article {
+    counter-reset: section;
+  }
+
+  .qc-article h2 {
+    counter-increment: section;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .qc-article h2::before {
+    content: counter(section, decimal-leading-zero);
+    font-family: var(--font-job-role);
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    color: #19224D;
+    opacity: 0.35;
+    /* Keep the number optically aligned with the heading's cap height */
+    transform: translateY(-0.35em);
+    flex-shrink: 0;
+  }
+
+  /* The markdown `---` separators become the chapter breaks */
+  .qc-article hr {
+    border: 0;
+    border-top: 1px solid rgba(25, 34, 77, 0.15);
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+  }
+
+  /* --- Figures break out of the reading column --------------------------- */
+  .qc-article figure {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .qc-article figure {
+      width: calc(100% + 8rem);
+      margin-left: -4rem;
+      margin-right: -4rem;
+    }
+  }
+
+  .qc-article figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .qc-article figcaption,
+  .qc-article p[style*="font-size: 0.8em"] {
+    position: static !important;
+    top: auto !important;
+    margin-top: 1rem !important;
+    margin-bottom: 0 !important;
+    padding-left: 0.25rem;
+    color: #6b7280 !important;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  /* Center all images including HTML img tags */
+  .qc-article img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Some content sets inline max-widths wider than the column - clamp them
+     so they can't overflow (and get clipped by overflow-x-hidden) */
+  .qc-article [style*="max-width"] {
+    max-width: 100% !important;
+  }
+
+  /* Offset anchor targets for the sticky top bar */
+  .qc-article :target {
+    scroll-margin-top: 6rem;
+  }
+</style>
+
+<script is:inline>
+  // Update back link based on query parameter
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get('from');
+    const backLink = document.getElementById('back-link');
+    const backLabel = document.getElementById('back-label');
+
+    if (from === 'projects' && backLink && backLabel) {
+      backLink.href = '/projects';
+      backLabel.textContent = 'Projects';
+    } else if (from === 'work' && backLink && backLabel) {
+      backLink.href = '/#work';
+      backLabel.textContent = 'Case Studies';
+    }
+  })();
+
+  // Reveal the framing questions when they scroll into view
+  (function() {
+    const section = document.getElementById('qc-questions');
+    if (!section) return;
+
+    // Marks that JS is running, which arms the hidden initial state. The CSS
+    // keeps the words visible until this is set, so a failed script leaves
+    // readable text instead of an empty gap.
+    section.setAttribute('data-observed', 'true');
+
+    function reveal() {
+      section.setAttribute('data-revealed', 'true');
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      reveal();
+      return;
+    }
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          reveal();
+          observer.disconnect(); // Runs once - no replay on scroll back up
+        }
+      });
+    }, { threshold: 0.25 });
+
+    observer.observe(section);
+  })();
+
+  // Mobile menu toggle
+  (function() {
+    const menuToggle = document.getElementById('project-menu-toggle');
+    const menuClose = document.getElementById('project-menu-close');
+    const mobileMenu = document.getElementById('project-mobile-menu');
+    const hamburgerIcon = document.getElementById('project-hamburger-icon');
+    const closeIcon = document.getElementById('project-close-icon');
+
+    function openMenu() {
+      mobileMenu?.classList.remove('hidden');
+      mobileMenu?.classList.add('flex');
+      mobileMenu?.offsetHeight; // Trigger reflow
+      mobileMenu?.classList.remove('translate-x-full');
+      mobileMenu?.classList.add('translate-x-0');
+      hamburgerIcon?.classList.add('hidden');
+      closeIcon?.classList.remove('hidden');
+      menuToggle?.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      mobileMenu?.classList.remove('translate-x-0');
+      mobileMenu?.classList.add('translate-x-full');
+      hamburgerIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+      menuToggle?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      setTimeout(function() {
+        mobileMenu?.classList.add('hidden');
+        mobileMenu?.classList.remove('flex');
+      }, 300);
+    }
+
+    menuToggle?.addEventListener('click', openMenu);
+    menuClose?.addEventListener('click', closeMenu);
+
+    // Close menu when clicking a link
+    mobileMenu?.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', closeMenu);
+    });
+  })();
+</script>

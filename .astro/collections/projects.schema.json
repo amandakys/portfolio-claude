@@ -34,8 +34,32 @@
         "workplace": {
           "type": "string"
         },
+        "role": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "year": {
+          "type": "string"
+        },
         "protected": {
           "type": "boolean"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "focus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pageTitle": {
+          "type": "string"
         },
         "$schema": {
           "type": "string"

@@ -18,6 +18,16 @@
   font-display: swap;
 }
 
+/* Real italic cut - without this the browser fakes the slant by shearing the
+   upright face, which mangles the letterforms */
+@font-face {
+  font-family: 'Roslindale Display';
+  src: url('/fonts/Roslindale-DisplayCondensedBoldItalic-Testing.otf') format('opentype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
 @theme {
   --font-heading: 'Roslindale Display', serif;
   --font-body: 'DM Sans', sans-serif;

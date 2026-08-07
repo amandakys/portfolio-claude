@@ -5,6 +5,9 @@ thumbnail: ./drum.png
 casestudy: true
 tags: ['creative', 'visual']
 description: "A comic documenting random moments in the life of a twentysomething "
+role: "Illustrator"
+company: "Personal project"
+year: "2015"
 ---
 
 After graduating from university and entering full time work, I found myself with an abundance of free time, a luxury I was not used to. I was able to take up a variety of hobbies like drumming, climbing and social ping pong with friends.

@@ -1,12 +1,15 @@
 ---
 title: Redesigning onboarding flows to improve Kedro adoption
+pageTitle: Developer Tools for Production Data Science
 date: "2025-01-01"
 thumbnail: ./kedro-background.png
-description: "As part of ongoing efforts to improve adoption numbers for the Kedro framework, I scoped and delivered designs for a staggered onboarding CLI flow that allowed users to customise their starting project to fit their needs and skill level"
+description: "Redesigning the onboarding flow and documentation for an open-source ML framework to drive adoption."
 casestudy: true
 showOnHomepage: false
 tags: ["UX", "research", "product"]
 workplace: QuantumBlack - AI by McKinsey
+role: "Technical UX Designer"
+year: "2022 — 2024"
 ---
 
 ## My Role

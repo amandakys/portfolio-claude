@@ -1,12 +1,20 @@
 ---
 title: Re-imagining insurance from claim to payout with AI
+pageTitle: A Unified Claims Platform
 date: "2025-06-01"
 thumbnail: ./quantco-background.png
-description: "As the founding designer at QuantCo, I lead design for their product efforts, integrating AI into insurance claim handling processes from claim to payout"
+description: "Equipping insurers with an AI-native platform to process claims, deployed at scale to bring clarity and speed to complex multimodal workflows."
 casestudy: true
 showOnHomepage: false
 tags: ["design", "AI", "product"]
+focus: ["AI-native", "Product Strategy"]
 workplace: QuantCo
+role: "Founding Designer"
+year: "2025 —"
+questions:
+  - "What does AI look like when embedded across every stage of insurance claims processing?"
+  - "What does it mean to design an AI-native claims platform from scratch?"
+  - "How do you create clarity across tools, teams, and workflows when none exist?"
 ---
 
 ## The Context

@@ -1,12 +1,15 @@
 ---
 title: Building developer tools and SPAs
+pageTitle: Interfaces for Cloud Deployment
 date: "2019-12-10"
 thumbnail: ./improbable-background.png
-description: "Worked across Games and Defence teams to design and build customer-facing web applications for a game development platform and a military decision-support tool, translating complex technical systems into usable interfaces"
+description: "Building the console game developers use to launch and monitor cloud deployments of games built with Improbable's simulation engine."
 casestudy: true
 showOnHomepage: false
 tags: ["design", "UX", "engineering"]
 workplace: Improbable Worlds Ltd.
+role: "UX Engineer"
+year: "2018 — 2020"
 ---
 
 ## My Role

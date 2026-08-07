@@ -1,5 +1,6 @@
 ---
 import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import QuantcoLayout from '../../layouts/QuantcoLayout.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -16,8 +17,11 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
+
+// Experimental layout, scoped to quantco while the new treatment is in progress
+const Layout = entry.slug === 'quantco' ? QuantcoLayout : ProjectLayout;
 ---
 
-<ProjectLayout entry={entry} headings={headings}>
+<Layout entry={entry} headings={headings}>
   <Content />
-</ProjectLayout>
+</Layout>

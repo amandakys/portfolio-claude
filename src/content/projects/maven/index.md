@@ -1,13 +1,16 @@
 ---
 title: Designing an internal derivatives trading platform
+pageTitle: A Trading Platform, Built In-House
 date: "2021-11-09"
 thumbnail: ./maven-background.png
-description: "Joined as the first designer, leading design on a greenfield internal trading platform: a data-intensive, table-based interactive web dashboard"
+description: "Designing a proprietary trading firm's first in-house execution platform, adapted to their trading workflows and internal systems."
 casestudy: true
 showOnHomepage: false
 tags: ["design", "UX", "product"]
 workplace: Maven Securities Ltd.
 protected: true
+role: "Lead Product Designer"
+year: "2020 — 2022"
 ---
 
 ## My Role

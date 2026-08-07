@@ -5,6 +5,9 @@ thumbnail: ./groupshot.jpg
 casestudy: true
 tags: ['creative']
 description: I wrote, directed and produced the show 'The Interview' performed at the Edinburgh Fringe Festival 2018.
+role: "Writer, Director & Producer"
+company: "Imperial College Dramatic Society"
+year: "2018"
 ---
 
 ## My Role
