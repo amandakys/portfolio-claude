@@ -469,6 +469,86 @@ const facts = [
     text-align: left;
   }
 
+  /* --- Platform diagram: agent pills ------------------------------------
+     Each agent is a self-contained pill. Nothing joins them to each other -
+     the dashed wrapper around the group is what says "pick from these". They
+     wrap rather than sit on a grid, so the set reads as a set and not as a
+     fixed number of slots. */
+  .qc-article .qc-agent {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    border-radius: 999px;
+    background: #FDFBF5;
+    border: 1px solid rgba(25, 34, 77, 0.09);
+    padding: 0.3125rem 0.75rem 0.3125rem 0.375rem;
+  }
+
+  .qc-article .qc-agent-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(25, 34, 77, 0.12);
+    color: rgba(25, 34, 77, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qc-article .qc-agent-icon svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    display: block;
+  }
+
+  .qc-article .qc-agent p {
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.2;
+    color: rgba(25, 34, 77, 0.9);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  /* --- Platform diagram: the connector band ------------------------------
+     One band, inside the data layer. It sits between the row of source labels
+     above it and the row of output cards below, and the lines in it join
+     those objects to each other - a source label at "16.7%" and the riser
+     under it are the same 16.7% of the same box.
+
+     The line SVG stretches to fill the band with preserveAspectRatio="none",
+     which is what locks those branch positions to percentages of the row
+     width no matter how wide the figure gets. That scale is very non-uniform
+     - x is stretched several times more than y - which is why the routing is
+     strictly orthogonal: verticals stay vertical and horizontals stay
+     horizontal under any scale, where a diagonal or curve would shear flat.
+     For the same reason the arrow tips are separate SVGs that keep their own
+     aspect ratio, and every stroke carries vector-effect="non-scaling-stroke"
+     so it stays 1px rather than being blown up with the x axis.
+
+     The band's viewBox height matches its rendered height in px (h-[72px] ->
+     72), so y units in the paths are px and the lines stop exactly where the
+     tips begin. Keep the two in step if either changes. */
+  .qc-article .qc-flow-inner {
+    position: relative;
+    height: 100%;
+  }
+
+  .qc-article .qc-flow-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .qc-article .qc-flow-tip {
+    position: absolute;
+    width: 10px;
+    height: 9px;
+    transform: translateX(-50%);
+  }
+
   /* Center all images including HTML img tags */
   .qc-article img {
     display: block;
