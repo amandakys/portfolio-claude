@@ -731,6 +731,17 @@ const facts = [
     color: #6b7280;
   }
 
+  /* The major/minor split has to survive into the fallback too, or the list
+     reads as seven equal events when it isn't one */
+  .qc-article .qc-tl-step[data-kind='minor'] {
+    border-left-color: rgba(25, 34, 77, 0.18);
+  }
+
+  .qc-article .qc-tl-step[data-kind='minor'] .qc-tl-step-title {
+    font-size: 1rem;
+    color: rgba(25, 34, 77, 0.75);
+  }
+
   .qc-article .qc-timeline[data-observed='true'] .qc-tl-steps {
     position: absolute;
     width: 1px;
@@ -769,14 +780,20 @@ const facts = [
     white-space: nowrap;
   }
 
+  /* Clickable across its whole width, not only on the marks - a click in a gap
+     snaps to the nearest one, so hitting a milestone never needs precision */
   .qc-article .qc-tl-track {
     position: relative;
     height: var(--qc-tl-head-h);
+    cursor: pointer;
   }
 
   .qc-article .qc-tl-layer {
     position: absolute;
     inset: 0;
+    /* Every layer sits over the full track, so they all have to let clicks
+       through to it. The marks put pointer events back on themselves only. */
+    pointer-events: none;
   }
 
   .qc-article .qc-tl-tick {
@@ -799,17 +816,66 @@ const facts = [
     background: var(--qc-tl-quarter);
   }
 
-  .qc-article .qc-tl-tick--mark {
+  /* --- Milestone marks ---------------------------------------------------
+     Buttons, because clicking one jumps the ticker to that step. The button is
+     a wide transparent hit area and the visible stem is drawn as ::after, so
+     the target is a comfortable 20px even though the mark reads as a 2px line.
+     Sizing the button itself down to the line would make it unhittable. */
+  .qc-article .qc-tl-mark {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    margin-left: -10px;
+    padding: 0;
+    border: 0;
+    background: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .qc-article .qc-tl-mark::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
     width: 2px;
-    height: var(--qc-tl-mark-h);
     margin-left: -1px;
+    height: var(--qc-tl-mark-h);
     background: var(--qc-tl-mark);
     transition: background-color 400ms ease, height 400ms ease;
   }
 
-  .qc-article .qc-tl-tick--mark.is-active {
+  /* Minor beats read as a lighter mark: a hairline rather than a stem, and
+     short enough to sit under the quarter ticks instead of over them */
+  .qc-article .qc-tl-mark--minor::after {
+    width: 1px;
+    height: calc(var(--qc-tl-mark-h) * 0.6);
+    background: rgba(25, 34, 77, 0.3);
+  }
+
+  .qc-article .qc-tl-mark.is-active::after {
     height: var(--qc-tl-quarter-h);
     background: var(--qc-tl-head);
+  }
+
+  /* Lit, but never as tall as a major one - the hierarchy has to survive being
+     the active step, or the ruler flattens out every time a minor comes round */
+  .qc-article .qc-tl-mark--minor.is-active::after {
+    height: calc(var(--qc-tl-quarter-h) * 0.68);
+  }
+
+  /* Hovering a mark previews it as reachable without moving anything */
+  .qc-article .qc-tl-mark:hover::after {
+    background: var(--qc-tl-head);
+  }
+
+  .qc-article .qc-tl-mark:focus-visible {
+    outline: 2px solid var(--qc-tl-head);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 
   .qc-article .qc-tl-head {
@@ -822,6 +888,8 @@ const facts = [
     border-radius: 1px;
     background: var(--qc-tl-head);
     transition: left 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease;
+    /* It parks on top of the active mark, and must not swallow its clicks */
+    pointer-events: none;
   }
 
   /* --- The caption -------------------------------------------------------
@@ -877,6 +945,62 @@ const facts = [
     font-size: 0.9375rem;
     line-height: 1.5;
     color: #6b7280;
+  }
+
+  /* A minor beat gets a narrower column and smaller type. Same face and same
+     structure - it is the same kind of thing, just a smaller one. */
+  .qc-article .qc-tl-cap-inner[data-kind='minor'] {
+    --qc-tl-cap-w: min(15.5rem, 100%);
+  }
+
+  .qc-article .qc-tl-cap-inner[data-kind='minor'] .qc-tl-cap-title {
+    font-size: 1.0625rem;
+    color: rgba(25, 34, 77, 0.78);
+  }
+
+  .qc-article .qc-tl-cap-inner[data-kind='minor'] .qc-tl-cap-desc {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* --- Word-by-word reveal -----------------------------------------------
+     The caption doesn't just appear when the ticker lands - it reads itself in,
+     a word at a time, title first and then the description. Each word carries
+     its own animation-delay, set by the script.
+
+     `both` is what holds a word invisible until its delay comes round; with the
+     default fill mode every word would be visible from the start and then jump.
+     No overflow clipping anywhere, because the blur has to spill past the
+     word's own box to read as a blur rather than a crop. */
+  .qc-article .qc-tl-word {
+    display: inline-block;
+  }
+
+  .qc-article .qc-tl-word-inner {
+    display: inline-block;
+    animation: qc-tl-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: transform, opacity, filter;
+  }
+
+  @keyframes qc-tl-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.5em);
+      filter: blur(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  /* The script renders every caption once at build to find the tallest and
+     reserve its height. That pass must not be seen, so the reveal is switched
+     off for its duration - otherwise all seven captions animate at once on load
+     before the ruler has even shown anything. */
+  .qc-article .qc-timeline[data-measuring='true'] .qc-tl-word-inner {
+    animation: none;
   }
 
   /* The ruler is ~18 months of week ticks. That is comfortable across the
@@ -984,9 +1108,18 @@ const facts = [
     // more than one milestone at a time.
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    var DWELL = 2600; // reading time at each milestone
+    // Reading time at each milestone. A minor beat is a shorter sentence and a
+    // smaller point, so it gets less of the cycle - holding both for the same
+    // stretch is what would make them feel equally important.
+    var DWELL_MAJOR = 2900;
+    var DWELL_MINOR = 2000;
     var TRAVEL = 900; // must match the ticker's `left` transition in the CSS
     var FADE = 260;   // must match the caption's opacity transition
+    // The word-by-word reveal. The title leads, then the description follows a
+    // beat later; both have to finish inside DWELL_MINOR, the shorter budget.
+    var TITLE_STAGGER = 62;
+    var DESC_STAGGER = 26;
+    var DESC_OFFSET = 130;
     var WEEK = 7 * 24 * 60 * 60 * 1000;
     var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -1008,6 +1141,7 @@ const facts = [
         if (!isFinite(at) || at < spanStart || at > spanEnd) return;
         steps.push({
           pct: pctOf(at, spanStart, spanEnd),
+          kind: item.getAttribute('data-kind') === 'minor' ? 'minor' : 'major',
           date: item.getAttribute('data-label') || monthLabel(at),
           title: textOf(item, '.qc-tl-step-title'),
           desc: textOf(item, '.qc-tl-step-desc')
@@ -1017,11 +1151,13 @@ const facts = [
       if (steps.length < 2) return;
 
       var stage = el('div', 'qc-tl-stage');
-      // The authored list stays in the accessibility tree. The ruler is a
-      // second rendering of the same content, so it must not be read out too.
-      stage.setAttribute('aria-hidden', 'true');
 
-      var years = el('div', 'qc-tl-years');
+      // The authored list stays in the accessibility tree, and the ruler is a
+      // second rendering of the same content - so everything decorative here is
+      // hidden from it one layer at a time. Not the stage as a whole: the marks
+      // are focusable buttons, and a focusable control inside an aria-hidden
+      // subtree is the one thing that arrangement must not produce.
+      var years = hidden(el('div', 'qc-tl-years'));
       eachYearStart(spanStart, spanEnd, function (ms, year) {
         var label = el('span', 'qc-tl-year');
         label.textContent = String(year);
@@ -1031,7 +1167,7 @@ const facts = [
 
       // Week ticks get their own layer so the CSS can thin them by nth-child on
       // narrow screens without catching the quarter and milestone ticks
-      var weeks = el('div', 'qc-tl-layer qc-tl-weeks');
+      var weeks = hidden(el('div', 'qc-tl-layer qc-tl-weeks'));
       var n = 0;
       for (var ms = spanStart; ms <= spanEnd; ms += WEEK, n += 1) {
         var week = el('span', 'qc-tl-tick' + (noise(n) > 0.72 ? ' qc-tl-tick--hi' : ''));
@@ -1039,25 +1175,40 @@ const facts = [
         weeks.appendChild(week);
       }
 
-      var majors = el('div', 'qc-tl-layer');
+      var quarters = hidden(el('div', 'qc-tl-layer qc-tl-quarters'));
       eachQuarterStart(spanStart, spanEnd, function (quarterMs) {
         var quarter = el('span', 'qc-tl-tick qc-tl-tick--quarter');
         quarter.style.left = pctOf(quarterMs, spanStart, spanEnd) + '%';
-        majors.appendChild(quarter);
+        quarters.appendChild(quarter);
       });
 
-      var marks = steps.map(function (step) {
-        var mark = el('span', 'qc-tl-tick qc-tl-tick--mark');
+      // The marks get a layer of their own, kept out of the hidden ones: they
+      // are the timeline's controls, so they are the part that stays reachable
+      var markLayer = el('div', 'qc-tl-layer qc-tl-marks');
+      var marks = steps.map(function (step, at) {
+        var mark = el('button', 'qc-tl-mark' + (step.kind === 'minor' ? ' qc-tl-mark--minor' : ''));
+        mark.setAttribute('type', 'button');
+        // The date and title, because a mark on its own is an unlabelled 2px
+        // line - and the ruler around it isn't readable to get context from
+        mark.setAttribute('aria-label', step.date + ': ' + step.title);
+        mark.addEventListener('click', function () { pick(at); });
         mark.style.left = step.pct + '%';
-        majors.appendChild(mark);
+        markLayer.appendChild(mark);
         return mark;
       });
 
-      var head = el('div', 'qc-tl-head');
+      var head = hidden(el('div', 'qc-tl-head'));
       var track = el('div', 'qc-tl-track');
       track.appendChild(weeks);
-      track.appendChild(majors);
+      track.appendChild(quarters);
+      track.appendChild(markLayer);
       track.appendChild(head);
+      // A click anywhere on the ruler goes to the nearest milestone, so the
+      // gaps between marks aren't dead space the reader has to aim around
+      track.addEventListener('click', function (event) {
+        if (event.target !== track) return; // a mark handled it already
+        pick(nearest(event));
+      });
 
       var capDate = el('p', 'qc-tl-cap-date');
       var capTitle = el('h4', 'qc-tl-cap-title');
@@ -1066,7 +1217,7 @@ const facts = [
       inner.appendChild(capDate);
       inner.appendChild(capTitle);
       inner.appendChild(capDesc);
-      var caption = el('div', 'qc-tl-caption');
+      var caption = hidden(el('div', 'qc-tl-caption'));
       caption.appendChild(inner);
 
       stage.appendChild(years);
@@ -1080,19 +1231,27 @@ const facts = [
       // Reserve the tallest caption before anything moves. Milestones differ in
       // length, and letting the block resize as the ticker walks would shunt
       // the rest of the page up and down every couple of seconds.
+      // The flag suppresses the word reveal for the duration: measuring runs
+      // through every caption in a single frame, and each one would otherwise
+      // start animating as it was passed over.
+      root.setAttribute('data-measuring', 'true');
       var tallest = 0;
       steps.forEach(function (step) {
         fill(step);
         tallest = Math.max(tallest, inner.offsetHeight);
       });
       root.style.setProperty('--qc-tl-cap-h', tallest + 'px');
+      root.removeAttribute('data-measuring');
 
       var index = 0;
       var running = false;
       var onScreen = false;
       var held = false;
       var cycleTimer = null;
+      // The second half of a swap, while it is in flight: held as a function so
+      // it can be finished early on a pause, or dropped if the reader overtakes
       var swapTimer = null;
+      var pending = null;
 
       // The measuring pass above has already resolved a style at 0%, so this
       // first placement has to suppress the transition or the ticker would
@@ -1129,27 +1288,33 @@ const facts = [
       function run() {
         if (running) return;
         running = true;
-        cycleTimer = setTimeout(onCycle, DWELL);
+        cycleTimer = setTimeout(onCycle, dwellOf(index));
       }
 
       function halt() {
         if (!running) return;
         running = false;
         clearTimeout(cycleTimer);
-        clearTimeout(swapTimer);
         cycleTimer = null;
-        swapTimer = null;
-        // Stopping part-way through a swap would otherwise leave the caption
-        // faded out, so settle on wherever the ticker was headed
-        fill(steps[index]);
-        inner.setAttribute('data-swap', 'false');
+        // Stopping part-way through a swap would leave the caption faded out,
+        // so it is finished off here. With nothing in flight the caption is
+        // already settled, and refilling it would replay the reveal for nothing.
+        settle();
+      }
+
+      // A minor beat holds for less time than a major one, so the wait is read
+      // off the step being moved to rather than being one figure for all of them
+      function dwellOf(i) {
+        return steps[i].kind === 'minor' ? DWELL_MINOR : DWELL_MAJOR;
       }
 
       function onCycle() {
         var next = (index + 1) % steps.length;
         if (next === 0) restart();
         else step(next);
-        cycleTimer = setTimeout(onCycle, DWELL);
+        // Read off `next`, not the current index: restart() doesn't move the
+        // ticker until its swap fires, so the index isn't there yet
+        cycleTimer = setTimeout(onCycle, dwellOf(next));
       }
 
       // Forward one milestone: the caption fades out where it stands while the
@@ -1158,11 +1323,68 @@ const facts = [
       function step(i) {
         inner.setAttribute('data-swap', 'true');
         place(i);
-        swapTimer = setTimeout(function () {
+        swap(function () {
           placeCaption(i);
           fill(steps[i]);
           inner.setAttribute('data-swap', 'false');
         }, TRAVEL - FADE);
+      }
+
+      // A mark clicked, or activated from the keyboard. The reader has taken
+      // over, so the cycle's own next move is abandoned and the wait is
+      // restarted from here - carrying on from the old schedule would move the
+      // ticker off the step they just asked for, sometimes immediately.
+      function pick(i) {
+        drop();
+        head.style.opacity = '';
+        if (i === index) {
+          // Already here, though possibly faded out mid-swap. Showing it again
+          // replays the reveal, which is the feedback that the click landed.
+          placeCaption(i);
+          fill(steps[i]);
+          inner.setAttribute('data-swap', 'false');
+        } else {
+          step(i);
+        }
+        if (!running) return;
+        clearTimeout(cycleTimer);
+        cycleTimer = setTimeout(onCycle, dwellOf(i));
+      }
+
+      // Which milestone a click on the bare track meant: the nearest one along
+      // the ruler, measured in the same percentages everything else is placed in
+      function nearest(event) {
+        var box = track.getBoundingClientRect();
+        if (!box.width) return index;
+        var at = ((event.clientX - box.left) / box.width) * 100;
+        var closest = 0;
+        steps.forEach(function (step, i) {
+          if (Math.abs(step.pct - at) < Math.abs(steps[closest].pct - at)) closest = i;
+        });
+        return closest;
+      }
+
+      function swap(finish, delay) {
+        pending = finish;
+        swapTimer = setTimeout(function () {
+          swapTimer = null;
+          pending = null;
+          finish();
+        }, delay);
+      }
+
+      // Runs a swap's second half now rather than on its timer
+      function settle() {
+        if (swapTimer === null) return;
+        var finish = pending;
+        drop();
+        finish();
+      }
+
+      function drop() {
+        clearTimeout(swapTimer);
+        swapTimer = null;
+        pending = null;
       }
 
       // Back to the beginning. The ticker doesn't sweep all the way back across
@@ -1171,7 +1393,7 @@ const facts = [
       function restart() {
         inner.setAttribute('data-swap', 'true');
         head.style.opacity = '0';
-        swapTimer = setTimeout(function () {
+        swap(function () {
           withoutTransition(function () {
             place(0);
             placeCaption(0);
@@ -1189,6 +1411,8 @@ const facts = [
         root.style.setProperty('--qc-tl-pct', String(steps[i].pct));
         marks.forEach(function (mark, at) {
           mark.classList.toggle('is-active', at === i);
+          if (at === i) mark.setAttribute('aria-current', 'true');
+          else mark.removeAttribute('aria-current');
         });
       }
 
@@ -1196,10 +1420,38 @@ const facts = [
         root.style.setProperty('--qc-tl-cap-pct', String(steps[i].pct));
       }
 
+      // The caption arrives a word at a time, the title leading and the
+      // description following it in. Which is why the text is rebuilt as spans
+      // rather than assigned: each word carries its own delay.
       function fill(step) {
         capDate.textContent = step.date;
-        capTitle.textContent = step.title;
-        capDesc.textContent = step.desc;
+        // Sizes the caption down for a minor beat, and narrows it - a short
+        // aside set at the same weight as a milestone doesn't read as an aside
+        inner.setAttribute('data-kind', step.kind);
+        var titled = words(capTitle, step.title, 0, TITLE_STAGGER);
+        // Offset from the title's last word, so the two never run together
+        words(capDesc, step.desc, titled * TITLE_STAGGER + DESC_OFFSET, DESC_STAGGER);
+      }
+
+      // Two spans per word: the outer one holds the line's flow, the inner one
+      // does the moving. Animating a single span would let the transform drag
+      // the layout around it.
+      function words(host, text, from, stagger) {
+        host.textContent = '';
+        var count = 0;
+        text.split(/\s+/).forEach(function (word) {
+          if (!word) return;
+          // A real space between them, so the line still wraps normally
+          if (count) host.appendChild(document.createTextNode(' '));
+          var slot = el('span', 'qc-tl-word');
+          var moving = el('span', 'qc-tl-word-inner');
+          moving.textContent = word;
+          moving.style.animationDelay = from + count * stagger + 'ms';
+          slot.appendChild(moving);
+          host.appendChild(slot);
+          count += 1;
+        });
+        return count;
       }
 
       // Reading offsetWidth in the middle flushes the new position, so putting
@@ -1217,6 +1469,13 @@ const facts = [
     function el(tag, className) {
       var node = document.createElement(tag);
       node.className = className;
+      return node;
+    }
+
+    // Everything that is a second rendering of the authored list, rather than a
+    // control, is kept out of the accessibility tree one node at a time
+    function hidden(node) {
+      node.setAttribute('aria-hidden', 'true');
       return node;
     }
 
@@ -1239,11 +1498,13 @@ const facts = [
 
     function eachYearStart(from, to, forEach) {
       var year = new Date(from).getUTCFullYear();
+      // A span that opens mid-year still has to name the year it opens in, or
+      // the ruler runs unlabelled until the next January. That one is pinned to
+      // the left edge: it annotates where the ruler starts, not a January.
+      if (Date.UTC(year, 0, 1) < from) forEach(from, year);
       for (;;) {
         var ms = Date.UTC(year, 0, 1);
         if (ms > to) return;
-        // A January before the span starts would have to be pinned to the left
-        // edge, labelling a date the ruler doesn't reach - so it's skipped
         if (ms >= from) forEach(ms, year);
         year += 1;
       }

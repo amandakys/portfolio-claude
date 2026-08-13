@@ -412,36 +412,42 @@ By creating clarity across tools, teams, and workflows, the platform helped Phys
      (or with reduced motion on) the list is what renders, which is why it is
      written to read as a list on its own.
      data-start / data-end set the span the ruler covers - keep a little room
-     either side of the first and last step. -->
-<div class="not-prose qc-timeline" data-qc-timeline data-start="2025-01-01" data-end="2026-09-01">
+     either side of the first and last step.
+     data-kind="minor" marks the smaller beats: a shorter tick, a smaller
+     caption and less time on screen. Anything without it is a major step. -->
+<div class="not-prose qc-timeline" data-qc-timeline data-start="2025-08-01" data-end="2026-10-01">
 <ol class="qc-tl-steps">
-<li class="qc-tl-step" data-date="2025-02-01" data-label="Feb 2025">
-<h4 class="qc-tl-step-title">First designer in the room</h4>
-<p class="qc-tl-step-desc">Joined a twenty-person delivery team that had never worked with a designer</p>
+<li class="qc-tl-step" data-date="2025-09-01" data-label="Sept 2025">
+<h4 class="qc-tl-step-title">Joined QuantCo</h4>
+<p class="qc-tl-step-desc">Joined as first designer to shape the platform experience</p>
 </li>
-<li class="qc-tl-step" data-date="2025-05-01" data-label="May 2025">
+<li class="qc-tl-step" data-kind="minor" data-date="2025-10-15" data-label="Oct 2025">
+<h4 class="qc-tl-step-title">Design embedded in delivery</h4>
+<p class="qc-tl-step-desc">Worked directly with customer teams to understand real workflows and constraints</p>
+</li>
+<li class="qc-tl-step" data-kind="minor" data-date="2025-12-01" data-label="Dec 2025">
 <h4 class="qc-tl-step-title">A shared vision</h4>
 <p class="qc-tl-step-desc">Ran workshops across teams to define what a QuantCo platform could be</p>
 </li>
-<li class="qc-tl-step" data-date="2025-08-01" data-label="Aug 2025">
+<li class="qc-tl-step" data-date="2026-02-01" data-label="Feb 2026">
 <h4 class="qc-tl-step-title">Roadmap and prioritisation</h4>
 <p class="qc-tl-step-desc">A framework holding client commitments and product bets in the same view</p>
 </li>
-<li class="qc-tl-step" data-date="2025-11-01" data-label="Nov 2025">
+<li class="qc-tl-step" data-kind="minor" data-date="2026-04-01" data-label="Apr 2026">
 <h4 class="qc-tl-step-title">Levels of automation</h4>
 <p class="qc-tl-step-desc">Interaction patterns for every level of human-in-the-loop an agent needs</p>
 </li>
-<li class="qc-tl-step" data-date="2026-02-01" data-label="Feb 2026">
+<li class="qc-tl-step" data-date="2026-06-01" data-label="Jun 2026">
 <h4 class="qc-tl-step-title">The platform frame</h4>
 <p class="qc-tl-step-desc">One navigation system and design language for every team to build into</p>
 </li>
-<li class="qc-tl-step" data-date="2026-05-01" data-label="May 2026">
+<li class="qc-tl-step" data-date="2026-08-01" data-label="Aug 2026">
 <h4 class="qc-tl-step-title">Design shaping the product</h4>
 <p class="qc-tl-step-desc">From helping teams ship tools to shaping the claims product experience</p>
 </li>
 </ol>
 </div>
-<figcaption>Eighteen months of platform work, from first designer to a product the whole company builds into</figcaption>
+<figcaption>A year of platform work, from first designer to a product the whole company builds into</figcaption>
 </figure>
 
 ---
