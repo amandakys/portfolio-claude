@@ -631,6 +631,277 @@ const facts = [
     .qc-article .qc-flow-node { animation: none; }
   }
 
+  /* --- Impact timeline ---------------------------------------------------
+     A ruler with a ticker that walks from one milestone to the next, the
+     caption tracking along underneath it.
+
+     Every position here - ticks, year labels, the ticker, the caption - is a
+     percentage of the ruler's width, and the ticker's position travels through
+     one custom property (--qc-tl-pct, a bare number read as percent) that the
+     script sets. That is why there is no measuring or resize code: the ruler
+     works at any width and reflows on its own.
+
+     Ticks are real elements rather than a repeating gradient because the
+     milestone ticks have to be addressable - the active one lights up - and a
+     gradient can't give us a handle on one of its own repeats.
+
+     The one property that transitions across a step is the ticker's `left`, a
+     plain percentage. The caption is moved instantly instead, which it can get
+     away with because it is faded out for the whole journey: it only becomes
+     visible once it has arrived. That also keeps clamp() (which does the
+     edge-of-ruler containment) out of any animation.
+
+     Which is why the ticker and the caption track two separate properties
+     rather than sharing one. They move at different moments - the ticker sets
+     off immediately, the caption jumps a beat later, once it has faded out. On
+     a single property the caption would slide sideways in full view before
+     fading, which is the one thing this arrangement is avoiding. */
+  .qc-article .qc-timeline {
+    /* Navy at low alpha, matching the rules elsewhere on the page. The ticker
+       is the only thing in coral, so it is the only place the eye goes. */
+    --qc-tl-tick: rgba(25, 34, 77, 0.18);
+    --qc-tl-tick-hi: rgba(25, 34, 77, 0.42);
+    --qc-tl-quarter: rgba(25, 34, 77, 0.14);
+    --qc-tl-mark: rgba(25, 34, 77, 0.5);
+    --qc-tl-head: #FC6B55;
+
+    --qc-tl-week-h: 15px;
+    --qc-tl-week-hi-h: 22px;
+    --qc-tl-mark-h: 26px;
+    --qc-tl-quarter-h: 40px;
+    --qc-tl-head-h: 84px;
+
+    --qc-tl-cap-w: min(19rem, 100%);
+    /* A placeholder until the script measures the tallest caption into it */
+    --qc-tl-cap-h: 8rem;
+    /* The ticker's position, and the caption's - a beat behind it */
+    --qc-tl-pct: 0;
+    --qc-tl-cap-pct: 0;
+  }
+
+  /* --- The authored list -------------------------------------------------
+     What renders with JS off or reduced motion on, so it has to stand on its
+     own. Once the script takes over it stays in the accessibility tree - the
+     ruler on top of it is decoration and is marked aria-hidden - so it is
+     hidden by clipping rather than by display: none. */
+  .qc-article .qc-tl-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .qc-article .qc-tl-steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .qc-article .qc-tl-step {
+    margin: 0;
+    padding-left: 0.875rem;
+    border-left: 2px solid rgba(252, 107, 85, 0.45);
+  }
+
+  .qc-article .qc-tl-step::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--font-job-role);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(25, 34, 77, 0.45);
+  }
+
+  .qc-article .qc-tl-step-title {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: 1.125rem;
+    line-height: 1.25;
+    color: #19224D;
+  }
+
+  .qc-article .qc-tl-step-desc {
+    margin: 0.375rem 0 0;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #6b7280;
+  }
+
+  .qc-article .qc-timeline[data-observed='true'] .qc-tl-steps {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* --- The ruler ---------------------------------------------------------
+     Built by the script, so it stays out of the way until the script has run */
+  .qc-article .qc-tl-stage {
+    display: none;
+  }
+
+  .qc-article .qc-timeline[data-observed='true'] .qc-tl-stage {
+    display: block;
+  }
+
+  .qc-article .qc-tl-years {
+    position: relative;
+    height: 1.5rem;
+  }
+
+  /* Set from the label's left edge, not its centre, so it reads as annotating
+     the tick that starts the year rather than floating over it */
+  .qc-article .qc-tl-year {
+    position: absolute;
+    bottom: 0;
+    margin-left: -1px;
+    font-family: var(--font-job-role);
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    color: rgba(25, 34, 77, 0.4);
+    white-space: nowrap;
+  }
+
+  .qc-article .qc-tl-track {
+    position: relative;
+    height: var(--qc-tl-head-h);
+  }
+
+  .qc-article .qc-tl-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .qc-article .qc-tl-tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: var(--qc-tl-week-h);
+    background: var(--qc-tl-tick);
+  }
+
+  /* Texture, not data: a seeded quarter of the week ticks run taller and
+     darker, which is what stops the ruler reading as graph paper */
+  .qc-article .qc-tl-tick--hi {
+    height: var(--qc-tl-week-hi-h);
+    background: var(--qc-tl-tick-hi);
+  }
+
+  .qc-article .qc-tl-tick--quarter {
+    height: var(--qc-tl-quarter-h);
+    background: var(--qc-tl-quarter);
+  }
+
+  .qc-article .qc-tl-tick--mark {
+    width: 2px;
+    height: var(--qc-tl-mark-h);
+    margin-left: -1px;
+    background: var(--qc-tl-mark);
+    transition: background-color 400ms ease, height 400ms ease;
+  }
+
+  .qc-article .qc-tl-tick--mark.is-active {
+    height: var(--qc-tl-quarter-h);
+    background: var(--qc-tl-head);
+  }
+
+  .qc-article .qc-tl-head {
+    position: absolute;
+    top: 0;
+    left: calc(var(--qc-tl-pct) * 1%);
+    width: 2px;
+    height: var(--qc-tl-head-h);
+    margin-left: -1px;
+    border-radius: 1px;
+    background: var(--qc-tl-head);
+    transition: left 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease;
+  }
+
+  /* --- The caption -------------------------------------------------------
+     Centred under the ticker, but clamped so it can't hang off either end of
+     the ruler - the first and last milestones sit close to the edges. The
+     height is reserved up front by the script so stepping between captions of
+     different lengths can't shunt the rest of the page up and down. */
+  .qc-article .qc-tl-caption {
+    position: relative;
+    height: var(--qc-tl-cap-h);
+    margin-top: 1.25rem;
+  }
+
+  .qc-article .qc-tl-cap-inner {
+    position: absolute;
+    top: 0;
+    width: var(--qc-tl-cap-w);
+    left: clamp(
+      0px,
+      calc(var(--qc-tl-cap-pct) * 1% - var(--qc-tl-cap-w) / 2),
+      calc(100% - var(--qc-tl-cap-w))
+    );
+    text-align: center;
+    transition: opacity 260ms ease, transform 260ms ease;
+  }
+
+  .qc-article .qc-tl-cap-inner[data-swap='true'] {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .qc-article .qc-tl-cap-date {
+    margin: 0;
+    font-family: var(--font-job-role);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(25, 34, 77, 0.4);
+  }
+
+  .qc-article .qc-tl-cap-title {
+    margin: 0.5rem 0 0;
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: 1.375rem;
+    line-height: 1.2;
+    color: #19224D;
+  }
+
+  .qc-article .qc-tl-cap-desc {
+    margin: 0.625rem 0 0;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: #6b7280;
+  }
+
+  /* The ruler is ~18 months of week ticks. That is comfortable across the
+     article column on a laptop and far too dense on a phone, so the ticks are
+     thinned to a fortnight and then a month as the screen narrows. Thinning by
+     nth-child is why the week ticks get their own layer - the quarter and
+     milestone ticks are siblings in a second one, and would otherwise be
+     caught by the same count. */
+  @media (max-width: 640px) {
+    .qc-article .qc-tl-weeks .qc-tl-tick:nth-child(even) {
+      display: none;
+    }
+
+    .qc-article .qc-timeline {
+      --qc-tl-head-h: 68px;
+      --qc-tl-quarter-h: 34px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .qc-article .qc-tl-weeks .qc-tl-tick:nth-child(4n + 3) {
+      display: none;
+    }
+  }
+
   /* Center all images including HTML img tags */
   .qc-article img {
     display: block;
@@ -696,6 +967,307 @@ const facts = [
     }, { threshold: 0.25 });
 
     observer.observe(section);
+  })();
+
+  // --- Impact timeline ----------------------------------------------------
+  // Builds the ruler out of the authored step list in the case study, then
+  // walks a ticker through the milestones for as long as the block is on
+  // screen. Nothing about the milestones lives here: the list is the only
+  // source of truth, and this reads it.
+  (function () {
+    var roots = document.querySelectorAll('[data-qc-timeline]');
+    if (!roots.length) return;
+
+    // Reduced motion keeps the authored list as-is. A caption that replaces
+    // itself every few seconds, unasked, is precisely what that setting is
+    // asking us not to do, and there is no still version of this that shows
+    // more than one milestone at a time.
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var DWELL = 2600; // reading time at each milestone
+    var TRAVEL = 900; // must match the ticker's `left` transition in the CSS
+    var FADE = 260;   // must match the caption's opacity transition
+    var WEEK = 7 * 24 * 60 * 60 * 1000;
+    var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    Array.prototype.forEach.call(roots, build);
+
+    function build(root) {
+      var list = root.querySelector('.qc-tl-steps');
+      if (!list) return;
+
+      var spanStart = Date.parse(root.getAttribute('data-start'));
+      var spanEnd = Date.parse(root.getAttribute('data-end'));
+      if (!isFinite(spanStart) || !isFinite(spanEnd) || spanEnd <= spanStart) return;
+
+      var steps = [];
+      Array.prototype.forEach.call(list.querySelectorAll('.qc-tl-step'), function (item) {
+        var at = Date.parse(item.getAttribute('data-date'));
+        // Anything outside the ruler's span is dropped rather than clamped to
+        // an end, which would put a milestone at a date it didn't happen
+        if (!isFinite(at) || at < spanStart || at > spanEnd) return;
+        steps.push({
+          pct: pctOf(at, spanStart, spanEnd),
+          date: item.getAttribute('data-label') || monthLabel(at),
+          title: textOf(item, '.qc-tl-step-title'),
+          desc: textOf(item, '.qc-tl-step-desc')
+        });
+      });
+      // With fewer than two there is nothing to walk through, so the list stays
+      if (steps.length < 2) return;
+
+      var stage = el('div', 'qc-tl-stage');
+      // The authored list stays in the accessibility tree. The ruler is a
+      // second rendering of the same content, so it must not be read out too.
+      stage.setAttribute('aria-hidden', 'true');
+
+      var years = el('div', 'qc-tl-years');
+      eachYearStart(spanStart, spanEnd, function (ms, year) {
+        var label = el('span', 'qc-tl-year');
+        label.textContent = String(year);
+        label.style.left = pctOf(ms, spanStart, spanEnd) + '%';
+        years.appendChild(label);
+      });
+
+      // Week ticks get their own layer so the CSS can thin them by nth-child on
+      // narrow screens without catching the quarter and milestone ticks
+      var weeks = el('div', 'qc-tl-layer qc-tl-weeks');
+      var n = 0;
+      for (var ms = spanStart; ms <= spanEnd; ms += WEEK, n += 1) {
+        var week = el('span', 'qc-tl-tick' + (noise(n) > 0.72 ? ' qc-tl-tick--hi' : ''));
+        week.style.left = pctOf(ms, spanStart, spanEnd) + '%';
+        weeks.appendChild(week);
+      }
+
+      var majors = el('div', 'qc-tl-layer');
+      eachQuarterStart(spanStart, spanEnd, function (quarterMs) {
+        var quarter = el('span', 'qc-tl-tick qc-tl-tick--quarter');
+        quarter.style.left = pctOf(quarterMs, spanStart, spanEnd) + '%';
+        majors.appendChild(quarter);
+      });
+
+      var marks = steps.map(function (step) {
+        var mark = el('span', 'qc-tl-tick qc-tl-tick--mark');
+        mark.style.left = step.pct + '%';
+        majors.appendChild(mark);
+        return mark;
+      });
+
+      var head = el('div', 'qc-tl-head');
+      var track = el('div', 'qc-tl-track');
+      track.appendChild(weeks);
+      track.appendChild(majors);
+      track.appendChild(head);
+
+      var capDate = el('p', 'qc-tl-cap-date');
+      var capTitle = el('h4', 'qc-tl-cap-title');
+      var capDesc = el('p', 'qc-tl-cap-desc');
+      var inner = el('div', 'qc-tl-cap-inner');
+      inner.appendChild(capDate);
+      inner.appendChild(capTitle);
+      inner.appendChild(capDesc);
+      var caption = el('div', 'qc-tl-caption');
+      caption.appendChild(inner);
+
+      stage.appendChild(years);
+      stage.appendChild(track);
+      stage.appendChild(caption);
+      root.insertBefore(stage, list);
+
+      // Arms the CSS: shows the ruler, clips the authored list
+      root.setAttribute('data-observed', 'true');
+
+      // Reserve the tallest caption before anything moves. Milestones differ in
+      // length, and letting the block resize as the ticker walks would shunt
+      // the rest of the page up and down every couple of seconds.
+      var tallest = 0;
+      steps.forEach(function (step) {
+        fill(step);
+        tallest = Math.max(tallest, inner.offsetHeight);
+      });
+      root.style.setProperty('--qc-tl-cap-h', tallest + 'px');
+
+      var index = 0;
+      var running = false;
+      var onScreen = false;
+      var held = false;
+      var cycleTimer = null;
+      var swapTimer = null;
+
+      // The measuring pass above has already resolved a style at 0%, so this
+      // first placement has to suppress the transition or the ticker would
+      // slide in from the left edge on load
+      withoutTransition(function () {
+        place(0);
+        placeCaption(0);
+      });
+      fill(steps[0]);
+
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          onScreen = entries[entries.length - 1].isIntersecting;
+          sync();
+        }, { threshold: 0.35 });
+        observer.observe(root);
+      } else {
+        onScreen = true;
+        sync();
+      }
+
+      // Pausing on hover and on focus is what makes an unprompted auto-advance
+      // reasonable: a reader who wants to stay on one milestone can
+      root.addEventListener('pointerenter', function () { held = true; sync(); });
+      root.addEventListener('pointerleave', function () { held = false; sync(); });
+      root.addEventListener('focusin', function () { held = true; sync(); });
+      root.addEventListener('focusout', function () { held = false; sync(); });
+
+      function sync() {
+        if (onScreen && !held) run();
+        else halt();
+      }
+
+      function run() {
+        if (running) return;
+        running = true;
+        cycleTimer = setTimeout(onCycle, DWELL);
+      }
+
+      function halt() {
+        if (!running) return;
+        running = false;
+        clearTimeout(cycleTimer);
+        clearTimeout(swapTimer);
+        cycleTimer = null;
+        swapTimer = null;
+        // Stopping part-way through a swap would otherwise leave the caption
+        // faded out, so settle on wherever the ticker was headed
+        fill(steps[index]);
+        inner.setAttribute('data-swap', 'false');
+      }
+
+      function onCycle() {
+        var next = (index + 1) % steps.length;
+        if (next === 0) restart();
+        else step(next);
+        cycleTimer = setTimeout(onCycle, DWELL);
+      }
+
+      // Forward one milestone: the caption fades out where it stands while the
+      // ticker sets off, then it moves and fades back in as the ticker lands.
+      // The delay is set so the fade-in finishes on arrival, not before it.
+      function step(i) {
+        inner.setAttribute('data-swap', 'true');
+        place(i);
+        swapTimer = setTimeout(function () {
+          placeCaption(i);
+          fill(steps[i]);
+          inner.setAttribute('data-swap', 'false');
+        }, TRAVEL - FADE);
+      }
+
+      // Back to the beginning. The ticker doesn't sweep all the way back across
+      // the ruler - it goes out where it is and returns at the start, which
+      // reads as a fresh pass rather than a rewind.
+      function restart() {
+        inner.setAttribute('data-swap', 'true');
+        head.style.opacity = '0';
+        swapTimer = setTimeout(function () {
+          withoutTransition(function () {
+            place(0);
+            placeCaption(0);
+          });
+          head.style.opacity = '';
+          fill(steps[0]);
+          inner.setAttribute('data-swap', 'false');
+        }, FADE);
+      }
+
+      // Moves the ticker and lights the milestone tick. The caption is left
+      // where it is - the callers decide when it catches up.
+      function place(i) {
+        index = i;
+        root.style.setProperty('--qc-tl-pct', String(steps[i].pct));
+        marks.forEach(function (mark, at) {
+          mark.classList.toggle('is-active', at === i);
+        });
+      }
+
+      function placeCaption(i) {
+        root.style.setProperty('--qc-tl-cap-pct', String(steps[i].pct));
+      }
+
+      function fill(step) {
+        capDate.textContent = step.date;
+        capTitle.textContent = step.title;
+        capDesc.textContent = step.desc;
+      }
+
+      // Reading offsetWidth in the middle flushes the new position, so putting
+      // the transitions back can't animate the jump we just made
+      function withoutTransition(change) {
+        head.style.transition = 'none';
+        inner.style.transition = 'none';
+        change();
+        void root.offsetWidth;
+        head.style.transition = '';
+        inner.style.transition = '';
+      }
+    }
+
+    function el(tag, className) {
+      var node = document.createElement(tag);
+      node.className = className;
+      return node;
+    }
+
+    function textOf(scope, selector) {
+      var found = scope.querySelector(selector);
+      return found ? found.textContent.trim() : '';
+    }
+
+    function pctOf(ms, from, to) {
+      return ((ms - from) / (to - from)) * 100;
+    }
+
+    // The dates are YYYY-MM-DD, which parses as UTC midnight, so the ruler is
+    // laid out in UTC as well. Local getters here would drift every tick by a
+    // day for readers west of Greenwich.
+    function monthLabel(ms) {
+      var when = new Date(ms);
+      return MONTHS[when.getUTCMonth()] + ' ' + when.getUTCFullYear();
+    }
+
+    function eachYearStart(from, to, forEach) {
+      var year = new Date(from).getUTCFullYear();
+      for (;;) {
+        var ms = Date.UTC(year, 0, 1);
+        if (ms > to) return;
+        // A January before the span starts would have to be pinned to the left
+        // edge, labelling a date the ruler doesn't reach - so it's skipped
+        if (ms >= from) forEach(ms, year);
+        year += 1;
+      }
+    }
+
+    function eachQuarterStart(from, to, forEach) {
+      var year = new Date(from).getUTCFullYear();
+      for (;;) {
+        for (var month = 0; month < 12; month += 3) {
+          var ms = Date.UTC(year, month, 1);
+          if (ms > to) return;
+          if (ms >= from) forEach(ms);
+        }
+        year += 1;
+      }
+    }
+
+    // Stable pseudo-random in [0, 1). The tick texture has to come out
+    // identical on every render, so nothing here may touch time or
+    // Math.random - the index is the whole input.
+    function noise(i) {
+      var x = Math.sin((i + 1) * 12.9898) * 43758.5453;
+      return x - Math.floor(x);
+    }
   })();
 
   // Mobile menu toggle
