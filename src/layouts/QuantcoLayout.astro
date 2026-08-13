@@ -679,7 +679,14 @@ const facts = [
        has to be too, so the two read as one line when it lands */
     --qc-tl-head-h: 84px;
 
-    --qc-tl-cap-w: min(17rem, 100%);
+    /* How far inside the block the ruler sits. The captions use the whole
+       block, so this is the room a milestone near either end borrows to be
+       centred - see .qc-tl-years and .qc-tl-cap-inner. */
+    --qc-tl-inset: 4rem;
+    /* The caption's width when there is room for it. If the inset can't cover
+       a milestone this close to an end, the caption narrows rather than
+       sliding off centre - see .qc-tl-cap-inner. */
+    --qc-tl-cap-w: 16rem;
     /* A placeholder until the script measures the tallest caption into it */
     --qc-tl-cap-h: 8rem;
     /* The ticker's position, and the caption's - a beat behind it */
@@ -768,6 +775,18 @@ const facts = [
 
   .qc-article .qc-timeline[data-observed='true'] .qc-tl-stage {
     display: block;
+  }
+
+  /* The ruler - the year labels and the track together - is inset inside the
+     block, and the captions underneath it are not. That gap is what gives the
+     first and last milestones room: a caption is centred on its line, so a
+     milestone near an end of the ruler needs half a caption's width of block
+     beside it, and the ruler's ends are no longer the block's ends. It also
+     leaves the year at the far right somewhere to put its label. */
+  .qc-article .qc-tl-years,
+  .qc-article .qc-tl-track {
+    margin-left: var(--qc-tl-inset);
+    margin-right: var(--qc-tl-inset);
   }
 
   .qc-article .qc-tl-years {
@@ -902,24 +921,44 @@ const facts = [
   }
 
   /* --- The caption -------------------------------------------------------
-     Centred under the ticker, but clamped so it can't hang off either end of
-     the ruler - the first and last milestones sit close to the edges. The
-     height is reserved up front by the script so stepping between captions of
-     different lengths can't shunt the rest of the page up and down. */
+     Centred on the ticker's line, always. The height is reserved up front by
+     the script so stepping between captions of different lengths can't shunt
+     the rest of the page up and down. */
   .qc-article .qc-tl-caption {
     position: relative;
     height: var(--qc-tl-cap-h);
     margin-top: 1.25rem;
   }
 
+  /* --qc-tl-cap-x is the selected line's distance from the left of this box.
+     The script writes positions as percentages of the ruler, and the ruler is
+     inset inside the block the captions span, so the inset has to be added
+     back on and the percentage taken of what is left. left puts the box's
+     origin there and translateX takes back half of its own width, so whatever
+     that width turns out to be, its centre is the line.
+
+     The width is the widest box that is both centred on that line and inside
+     the block: twice the distance to whichever end is nearer, or the preferred
+     width when there is room for it. A box centred 10% along can only be 20%
+     wide, so something has to give near the ends, and it is the width - it
+     used to be the centring, the caption clamping itself inside the block,
+     which read as the first entry being misaligned. The inset above is sized
+     so that on a full-width column nothing has to give at all; the min() is
+     what holds this together on a narrow screen, where the caption wraps to
+     more lines rather than drifting off its line. */
   .qc-article .qc-tl-cap-inner {
+    --qc-tl-cap-x: calc(
+      var(--qc-tl-inset) +
+      var(--qc-tl-cap-pct) * (100% - 2 * var(--qc-tl-inset)) / 100
+    );
     position: absolute;
     top: 0;
-    width: var(--qc-tl-cap-w);
-    left: clamp(
-      0px,
-      calc(var(--qc-tl-cap-pct) * 1% - var(--qc-tl-cap-w) / 2),
-      calc(100% - var(--qc-tl-cap-w))
+    left: var(--qc-tl-cap-x);
+    transform: translateX(-50%);
+    width: min(
+      var(--qc-tl-cap-w),
+      calc(2 * var(--qc-tl-cap-x)),
+      calc(200% - 2 * var(--qc-tl-cap-x))
     );
     text-align: center;
     /* Opacity alone. One caption crosses into the next and nothing else moves -
@@ -959,7 +998,7 @@ const facts = [
     color: rgba(25, 34, 77, 0.78);
   }
 
-  /* Eighteen months of week lines is comfortable across the article column on a
+  /* Nineteen months of week lines is comfortable across the article column on a
      laptop and far too dense on a phone, so the ruler is thinned to a fortnight
      and then to a month as the screen narrows. The lines to drop are marked in
      the script rather than counted with nth-child: the months that hold a
@@ -973,6 +1012,19 @@ const facts = [
     .qc-article .qc-timeline {
       --qc-tl-head-h: 68px;
       --qc-tl-mark-h: 26px;
+      /* Nothing to spare: the ruler takes the whole block */
+      --qc-tl-inset: 0px;
+    }
+
+    /* And with the block this narrow there is no column to be centred on a
+       line either - a caption beside the first milestone could only be about
+       a fifth of the screen wide, which is a word per line. So the caption
+       takes the full width and is centred in the block, and the ticker on the
+       ruler above it is what says which milestone is up. */
+    .qc-article .qc-tl-cap-inner {
+      left: 0;
+      width: 100%;
+      transform: none;
     }
   }
 
@@ -1065,11 +1117,11 @@ const facts = [
     // more than one milestone at a time.
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    // Reading time at each milestone. A minor beat is a shorter sentence and a
-    // smaller point, so it gets less of the cycle - holding both for the same
-    // stretch is what would make them feel equally important.
-    var DWELL_MAJOR = 2900;
-    var DWELL_MINOR = 2000;
+    // Reading time at each milestone - the same at every one, so the cycle has
+    // a steady beat you can settle into rather than one that hurries through
+    // some entries. What makes a minor beat minor is its line on the ruler and
+    // its softer title, not being taken off the screen sooner.
+    var DWELL = 3000;
     var TRAVEL = 900; // must match the ticker's `left` transition in the CSS
     var FADE = 300;   // must match the caption's opacity transition
     // The ruler's one unit of measure. Every month is four week lines wide
@@ -1122,7 +1174,10 @@ const facts = [
       // Only the Januaries inside the ruler are labelled. A part-year at either
       // end has no January to sit on, and pinning its label to the edge would
       // name a point the ruler doesn't start at - so it goes unlabelled, which
-      // is why a July-to-December span carries a single year.
+      // is why a July-2025-to-January-2027 span carries a 2026 and a 2027 but
+      // no 2025. The label sits at the start of its year, and the ruler is
+      // inset inside the block, so a January near the far end has somewhere to
+      // put its label.
       var years = hidden(el('div', 'qc-tl-years'));
       for (var month = first; month <= last; month += 1) {
         if (month % 12 !== 0) continue;
@@ -1196,17 +1251,12 @@ const facts = [
       // Arms the CSS: shows the ruler, clips the authored list
       root.setAttribute('data-observed', 'true');
 
-      // Reserve the tallest caption before anything moves. Milestones differ in
-      // length, and letting the block resize as the ticker walks would shunt
-      // the rest of the page up and down every couple of seconds.
-      var tallest = 0;
-      steps.forEach(function (step) {
-        fill(step);
-        tallest = Math.max(tallest, inner.offsetHeight);
-      });
-      root.style.setProperty('--qc-tl-cap-h', tallest + 'px');
-
       var index = 0;
+      // Which milestone the caption is currently showing. Not the same as index
+      // during a move: the ticker leaves first and the caption follows, and
+      // measure() has to put back what was on screen rather than what is being
+      // travelled to.
+      var shown = 0;
       var running = false;
       var onScreen = false;
       var held = false;
@@ -1216,15 +1266,23 @@ const facts = [
       var swapTimer = null;
       var pending = null;
 
-      // The measuring pass above has already resolved a style at 0%, so this
-      // first placement has to suppress the transition or the ticker would
-      // slide in from the left edge on load
+      // The ticker starts at 0% in the CSS, so this first placement has to
+      // suppress the transition or it would slide in from the left edge on load
       withoutTransition(function () {
         place(0);
         placeCaption(0);
       });
       light(0);
       fill(steps[0]);
+      measure();
+
+      // A caption's width follows the column's, and its height follows its
+      // width, so what the block has to reserve changes with the window
+      var remeasure = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(remeasure);
+        remeasure = setTimeout(measure, 150);
+      });
 
       if ('IntersectionObserver' in window) {
         var observer = new IntersectionObserver(function (entries) {
@@ -1252,7 +1310,7 @@ const facts = [
       function run() {
         if (running) return;
         running = true;
-        cycleTimer = setTimeout(onCycle, dwellOf(index));
+        cycleTimer = setTimeout(onCycle, DWELL);
       }
 
       function halt() {
@@ -1266,19 +1324,11 @@ const facts = [
         settle();
       }
 
-      // A minor beat holds for less time than a major one, so the wait is read
-      // off the step being moved to rather than being one figure for all of them
-      function dwellOf(i) {
-        return steps[i].kind === 'minor' ? DWELL_MINOR : DWELL_MAJOR;
-      }
-
       function onCycle() {
         var next = (index + 1) % steps.length;
         if (next === 0) restart();
         else step(next);
-        // Read off `next`, not the current index: restart() doesn't move the
-        // ticker until its swap fires, so the index isn't there yet
-        cycleTimer = setTimeout(onCycle, dwellOf(next));
+        cycleTimer = setTimeout(onCycle, DWELL);
       }
 
       // Forward one milestone: the caption fades out where it stands while the
@@ -1314,7 +1364,7 @@ const facts = [
         }
         if (!running) return;
         clearTimeout(cycleTimer);
-        cycleTimer = setTimeout(onCycle, dwellOf(i));
+        cycleTimer = setTimeout(onCycle, DWELL);
       }
 
       // Which milestone a click on the bare track meant: the nearest one along
@@ -1396,7 +1446,27 @@ const facts = [
       }
 
       function placeCaption(i) {
+        shown = i;
         root.style.setProperty('--qc-tl-cap-pct', String(steps[i].pct));
+      }
+
+      // Reserve the tallest caption, so that stepping between milestones of
+      // different lengths doesn't shunt the rest of the page up and down every
+      // few seconds. Each one is measured where it will really sit, because a
+      // caption near an end of the ruler is narrower and so wraps to more lines
+      // - see the width in the CSS. The walk isn't animated and isn't painted:
+      // it all happens inside one frame, and it ends back where it started.
+      function measure() {
+        var was = shown;
+        var tallest = 0;
+        steps.forEach(function (step, i) {
+          placeCaption(i);
+          fill(step);
+          tallest = Math.max(tallest, inner.offsetHeight);
+        });
+        placeCaption(was);
+        fill(steps[was]);
+        root.style.setProperty('--qc-tl-cap-h', tallest + 'px');
       }
 
       // Only the text. The caption crosses from one step to the next on opacity

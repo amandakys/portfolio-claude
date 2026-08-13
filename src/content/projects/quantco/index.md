@@ -414,9 +414,13 @@ By creating clarity across tools, teams, and workflows, the platform helped Phys
      data-start / data-end are the first and last month the ruler covers. Only
      the year and month are read from any date here: the ruler's unit is a
      month, and a step sits on a month line rather than somewhere inside it.
-     data-kind="minor" marks the smaller beats: a lighter line, a smaller
-     caption and less time on screen. Anything without it is a major step. -->
-<div class="not-prose qc-timeline" data-qc-timeline data-start="2025-07-01" data-end="2026-12-01">
+     Every January inside the span is labelled, so July 2025 to January 2027
+     carries a 2026 and a 2027. The room the first entry needs to be centred
+     under its line comes from the ruler being inset inside the block rather
+     than from the span - see --qc-tl-inset in QuantcoLayout.astro.
+     data-kind="minor" marks the smaller beats: a lighter line, a softer title
+     and less time on screen. Anything without it is a major step. -->
+<div class="not-prose qc-timeline" data-qc-timeline data-start="2025-07-01" data-end="2027-01-01">
 <ol class="qc-tl-steps">
 <li class="qc-tl-step" data-date="2025-09-01" data-label="Sept 2025">
 <h4 class="qc-tl-step-title">Joined QuantCo</h4>
