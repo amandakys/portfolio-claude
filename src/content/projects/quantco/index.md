@@ -411,17 +411,18 @@ By creating clarity across tools, teams, and workflows, the platform helped Phys
      truth: edit, reorder or add a step here and the ruler follows. Without JS
      (or with reduced motion on) the list is what renders, which is why it is
      written to read as a list on its own.
-     data-start / data-end set the span the ruler covers - keep a little room
-     either side of the first and last step.
-     data-kind="minor" marks the smaller beats: a shorter tick, a smaller
+     data-start / data-end are the first and last month the ruler covers. Only
+     the year and month are read from any date here: the ruler's unit is a
+     month, and a step sits on a month line rather than somewhere inside it.
+     data-kind="minor" marks the smaller beats: a lighter line, a smaller
      caption and less time on screen. Anything without it is a major step. -->
-<div class="not-prose qc-timeline" data-qc-timeline data-start="2025-08-01" data-end="2026-10-01">
+<div class="not-prose qc-timeline" data-qc-timeline data-start="2025-07-01" data-end="2026-12-01">
 <ol class="qc-tl-steps">
 <li class="qc-tl-step" data-date="2025-09-01" data-label="Sept 2025">
 <h4 class="qc-tl-step-title">Joined QuantCo</h4>
 <p class="qc-tl-step-desc">Joined as first designer to shape the platform experience</p>
 </li>
-<li class="qc-tl-step" data-kind="minor" data-date="2025-10-15" data-label="Oct 2025">
+<li class="qc-tl-step" data-kind="minor" data-date="2025-10-01" data-label="Oct 2025">
 <h4 class="qc-tl-step-title">Design embedded in delivery</h4>
 <p class="qc-tl-step-desc">Worked directly with customer teams to understand real workflows and constraints</p>
 </li>

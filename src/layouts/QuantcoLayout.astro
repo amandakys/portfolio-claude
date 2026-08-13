@@ -641,9 +641,16 @@ const facts = [
      script sets. That is why there is no measuring or resize code: the ruler
      works at any width and reflows on its own.
 
-     Ticks are real elements rather than a repeating gradient because the
-     milestone ticks have to be addressable - the active one lights up - and a
-     gradient can't give us a handle on one of its own repeats.
+     The ruler is a regular interval rather than a calendar: one line a week,
+     every fourth one longer for the start of a month. So a month is four weeks
+     wide here whatever the month is - real lengths of 28 to 31 days would put
+     the long lines at uneven distances, and the eye reads uneven spacing on a
+     ruler as a mistake rather than as February.
+
+     Lines are real elements rather than a repeating gradient because the ones
+     with a milestone on them have to be addressable - they are coral, they
+     extend when selected, and they are buttons - and a gradient can't give us a
+     handle on one of its own repeats.
 
      The one property that transitions across a step is the ticker's `left`, a
      plain percentage. The caption is moved instantly instead, which it can get
@@ -657,18 +664,19 @@ const facts = [
      a single property the caption would slide sideways in full view before
      fading, which is the one thing this arrangement is avoiding. */
   .qc-article .qc-timeline {
-    /* Navy at low alpha, matching the rules elsewhere on the page. The ticker
-       is the only thing in coral, so it is the only place the eye goes. */
-    --qc-tl-tick: rgba(25, 34, 77, 0.18);
-    --qc-tl-tick-hi: rgba(25, 34, 77, 0.42);
-    --qc-tl-quarter: rgba(25, 34, 77, 0.14);
-    --qc-tl-mark: rgba(25, 34, 77, 0.5);
+    /* Navy at low alpha for the bare ruler, matching the rules elsewhere on the
+       page. Coral is reserved for the months that have something in them, so
+       scanning the ruler for colour is the same as scanning it for content. */
+    --qc-tl-tick: rgba(25, 34, 77, 0.16);
+    --qc-tl-month: rgba(25, 34, 77, 0.34);
     --qc-tl-head: #FC6B55;
 
-    --qc-tl-week-h: 15px;
-    --qc-tl-week-hi-h: 22px;
-    --qc-tl-mark-h: 26px;
-    --qc-tl-quarter-h: 40px;
+    --qc-tl-week-h: 12px;
+    --qc-tl-month-h: 22px;
+    /* A month with a milestone in it, before it is the selected one */
+    --qc-tl-mark-h: 30px;
+    /* And once it is: down to the caption, which is what the ticker's height
+       has to be too, so the two read as one line when it lands */
     --qc-tl-head-h: 84px;
 
     --qc-tl-cap-w: min(19rem, 100%);
@@ -804,23 +812,18 @@ const facts = [
     background: var(--qc-tl-tick);
   }
 
-  /* Texture, not data: a seeded quarter of the week ticks run taller and
-     darker, which is what stops the ruler reading as graph paper */
-  .qc-article .qc-tl-tick--hi {
-    height: var(--qc-tl-week-hi-h);
-    background: var(--qc-tl-tick-hi);
+  /* Every fourth line, so a month reads as a unit without being labelled */
+  .qc-article .qc-tl-tick--month {
+    height: var(--qc-tl-month-h);
+    background: var(--qc-tl-month);
   }
 
-  .qc-article .qc-tl-tick--quarter {
-    height: var(--qc-tl-quarter-h);
-    background: var(--qc-tl-quarter);
-  }
-
-  /* --- Milestone marks ---------------------------------------------------
-     Buttons, because clicking one jumps the ticker to that step. The button is
-     a wide transparent hit area and the visible stem is drawn as ::after, so
-     the target is a comfortable 20px even though the mark reads as a 2px line.
-     Sizing the button itself down to the line would make it unhittable. */
+  /* --- Months with something in them -------------------------------------
+     The same month line as any other, in coral and a little longer, and a
+     button: clicking one jumps the ticker to that step. The button is a wide
+     transparent hit area and the visible line is drawn as ::after, so the
+     target is a comfortable 20px even though it reads as a 2px line. Sizing
+     the button down to the line itself would make it unhittable. */
   .qc-article .qc-tl-mark {
     position: absolute;
     top: 0;
@@ -844,32 +847,38 @@ const facts = [
     width: 2px;
     margin-left: -1px;
     height: var(--qc-tl-mark-h);
-    background: var(--qc-tl-mark);
-    transition: background-color 400ms ease, height 400ms ease;
+    background: var(--qc-tl-head);
+    transition: height 460ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* Minor beats read as a lighter mark: a hairline rather than a stem, and
-     short enough to sit under the quarter ticks instead of over them */
+  /* A minor beat is the same coral line drawn thinner and paler - the month
+     still has something in it, and the ruler shouldn't say otherwise */
   .qc-article .qc-tl-mark--minor::after {
     width: 1px;
-    height: calc(var(--qc-tl-mark-h) * 0.6);
-    background: rgba(25, 34, 77, 0.3);
+    height: var(--qc-tl-month-h);
+    background: rgba(252, 107, 85, 0.55);
   }
 
+  /* Selected: the line runs down to its caption, so the two are one shape
+     rather than a mark with a label somewhere below it. Both kinds extend the
+     whole way - a minor stopping short would leave its caption floating - so
+     the hierarchy stays in the width and in the caption. */
   .qc-article .qc-tl-mark.is-active::after {
-    height: var(--qc-tl-quarter-h);
-    background: var(--qc-tl-head);
+    height: var(--qc-tl-head-h);
   }
 
-  /* Lit, but never as tall as a major one - the hierarchy has to survive being
-     the active step, or the ruler flattens out every time a minor comes round */
   .qc-article .qc-tl-mark--minor.is-active::after {
-    height: calc(var(--qc-tl-quarter-h) * 0.68);
+    background: var(--qc-tl-head);
   }
 
-  /* Hovering a mark previews it as reachable without moving anything */
+  /* Hovering reaches part of the way, previewing where a click would take it */
   .qc-article .qc-tl-mark:hover::after {
+    height: calc(var(--qc-tl-mark-h) + 10px);
     background: var(--qc-tl-head);
+  }
+
+  .qc-article .qc-tl-mark.is-active:hover::after {
+    height: var(--qc-tl-head-h);
   }
 
   .qc-article .qc-tl-mark:focus-visible {
@@ -1003,25 +1012,26 @@ const facts = [
     animation: none;
   }
 
-  /* The ruler is ~18 months of week ticks. That is comfortable across the
-     article column on a laptop and far too dense on a phone, so the ticks are
-     thinned to a fortnight and then a month as the screen narrows. Thinning by
-     nth-child is why the week ticks get their own layer - the quarter and
-     milestone ticks are siblings in a second one, and would otherwise be
-     caught by the same count. */
+  /* Eighteen months of week lines is comfortable across the article column on a
+     laptop and far too dense on a phone, so the ruler is thinned to a fortnight
+     and then to a month as the screen narrows. The lines to drop are marked in
+     the script rather than counted with nth-child: the months that hold a
+     milestone are drawn separately, so the count has gaps in it and nth-child
+     would start hiding month lines instead. */
   @media (max-width: 640px) {
-    .qc-article .qc-tl-weeks .qc-tl-tick:nth-child(even) {
+    .qc-article .qc-tl-tick--fine {
       display: none;
     }
 
     .qc-article .qc-timeline {
       --qc-tl-head-h: 68px;
-      --qc-tl-quarter-h: 34px;
+      --qc-tl-mark-h: 26px;
     }
   }
 
+  /* Only the month lines left, which is still a reading of the same ruler */
   @media (max-width: 420px) {
-    .qc-article .qc-tl-weeks .qc-tl-tick:nth-child(4n + 3) {
+    .qc-article .qc-tl-tick:not(.qc-tl-tick--month) {
       display: none;
     }
   }
@@ -1120,7 +1130,9 @@ const facts = [
     var TITLE_STAGGER = 62;
     var DESC_STAGGER = 26;
     var DESC_OFFSET = 130;
-    var WEEK = 7 * 24 * 60 * 60 * 1000;
+    // The ruler's one unit of measure. Every month is four week lines wide
+    // whatever its real length: see the note on the CSS block for why.
+    var WEEKS_PER_MONTH = 4;
     var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     Array.prototype.forEach.call(roots, build);
@@ -1129,20 +1141,28 @@ const facts = [
       var list = root.querySelector('.qc-tl-steps');
       if (!list) return;
 
-      var spanStart = Date.parse(root.getAttribute('data-start'));
-      var spanEnd = Date.parse(root.getAttribute('data-end'));
-      if (!isFinite(spanStart) || !isFinite(spanEnd) || spanEnd <= spanStart) return;
+      var first = monthOf(root.getAttribute('data-start'));
+      var last = monthOf(root.getAttribute('data-end'));
+      if (first === null || last === null || last <= first) return;
+
+      // Both ends are inclusive, and the closing month is drawn whole - so the
+      // ruler runs out in week lines rather than stopping dead on a month line
+      var lines = (last - first + 1) * WEEKS_PER_MONTH;
 
       var steps = [];
       Array.prototype.forEach.call(list.querySelectorAll('.qc-tl-step'), function (item) {
-        var at = Date.parse(item.getAttribute('data-date'));
+        var month = monthOf(item.getAttribute('data-date'));
         // Anything outside the ruler's span is dropped rather than clamped to
         // an end, which would put a milestone at a date it didn't happen
-        if (!isFinite(at) || at < spanStart || at > spanEnd) return;
+        if (month === null || month < first || month > last) return;
+        // Which is what puts every step on a month line: the line is worked out
+        // from the month, so a step can't land between two of them
+        var line = (month - first) * WEEKS_PER_MONTH;
         steps.push({
-          pct: pctOf(at, spanStart, spanEnd),
+          line: line,
+          pct: pctAt(line),
           kind: item.getAttribute('data-kind') === 'minor' ? 'minor' : 'major',
-          date: item.getAttribute('data-label') || monthLabel(at),
+          date: item.getAttribute('data-label') || monthLabel(month),
           title: textOf(item, '.qc-tl-step-title'),
           desc: textOf(item, '.qc-tl-step-desc')
         });
@@ -1157,39 +1177,44 @@ const facts = [
       // hidden from it one layer at a time. Not the stage as a whole: the marks
       // are focusable buttons, and a focusable control inside an aria-hidden
       // subtree is the one thing that arrangement must not produce.
+      // Only the Januaries inside the ruler are labelled. A part-year at either
+      // end has no January to sit on, and pinning its label to the edge would
+      // name a point the ruler doesn't start at - so it goes unlabelled, which
+      // is why a July-to-December span carries a single year.
       var years = hidden(el('div', 'qc-tl-years'));
-      eachYearStart(spanStart, spanEnd, function (ms, year) {
+      for (var month = first; month <= last; month += 1) {
+        if (month % 12 !== 0) continue;
         var label = el('span', 'qc-tl-year');
-        label.textContent = String(year);
-        label.style.left = pctOf(ms, spanStart, spanEnd) + '%';
+        label.textContent = String(Math.floor(month / 12));
+        label.style.left = pctAt((month - first) * WEEKS_PER_MONTH) + '%';
         years.appendChild(label);
-      });
+      }
 
-      // Week ticks get their own layer so the CSS can thin them by nth-child on
-      // narrow screens without catching the quarter and milestone ticks
+      // The lines a milestone sits on, so the ruler can leave those out: a grey
+      // month line drawn under a coral one would only show through it
+      var taken = {};
+      steps.forEach(function (step) { taken[step.line] = true; });
+
       var weeks = hidden(el('div', 'qc-tl-layer qc-tl-weeks'));
-      var n = 0;
-      for (var ms = spanStart; ms <= spanEnd; ms += WEEK, n += 1) {
-        var week = el('span', 'qc-tl-tick' + (noise(n) > 0.72 ? ' qc-tl-tick--hi' : ''));
-        week.style.left = pctOf(ms, spanStart, spanEnd) + '%';
+      for (var i = 0; i < lines; i += 1) {
+        if (taken[i]) continue;
+        var week = el('span', 'qc-tl-tick'
+          + (i % WEEKS_PER_MONTH === 0 ? ' qc-tl-tick--month' : '')
+          // Marked here rather than counted in CSS, since the loop skips lines
+          + (i % 2 === 1 ? ' qc-tl-tick--fine' : ''));
+        week.style.left = pctAt(i) + '%';
         weeks.appendChild(week);
       }
 
-      var quarters = hidden(el('div', 'qc-tl-layer qc-tl-quarters'));
-      eachQuarterStart(spanStart, spanEnd, function (quarterMs) {
-        var quarter = el('span', 'qc-tl-tick qc-tl-tick--quarter');
-        quarter.style.left = pctOf(quarterMs, spanStart, spanEnd) + '%';
-        quarters.appendChild(quarter);
-      });
-
-      // The marks get a layer of their own, kept out of the hidden ones: they
-      // are the timeline's controls, so they are the part that stays reachable
+      // The months with something in them get a layer of their own, kept out of
+      // the hidden ones: they are the timeline's controls, so they are the part
+      // that stays reachable
       var markLayer = el('div', 'qc-tl-layer qc-tl-marks');
       var marks = steps.map(function (step, at) {
         var mark = el('button', 'qc-tl-mark' + (step.kind === 'minor' ? ' qc-tl-mark--minor' : ''));
         mark.setAttribute('type', 'button');
-        // The date and title, because a mark on its own is an unlabelled 2px
-        // line - and the ruler around it isn't readable to get context from
+        // The date and title, because the line on its own is unlabelled - and
+        // the ruler around it isn't readable to take any context from
         mark.setAttribute('aria-label', step.date + ': ' + step.title);
         mark.addEventListener('click', function () { pick(at); });
         mark.style.left = step.pct + '%';
@@ -1200,7 +1225,6 @@ const facts = [
       var head = hidden(el('div', 'qc-tl-head'));
       var track = el('div', 'qc-tl-track');
       track.appendChild(weeks);
-      track.appendChild(quarters);
       track.appendChild(markLayer);
       track.appendChild(head);
       // A click anywhere on the ruler goes to the nearest milestone, so the
@@ -1260,6 +1284,7 @@ const facts = [
         place(0);
         placeCaption(0);
       });
+      light(0);
       fill(steps[0]);
 
       if ('IntersectionObserver' in window) {
@@ -1324,6 +1349,7 @@ const facts = [
         inner.setAttribute('data-swap', 'true');
         place(i);
         swap(function () {
+          light(i);
           placeCaption(i);
           fill(steps[i]);
           inner.setAttribute('data-swap', 'false');
@@ -1340,6 +1366,7 @@ const facts = [
         if (i === index) {
           // Already here, though possibly faded out mid-swap. Showing it again
           // replays the reveal, which is the feedback that the click landed.
+          light(i);
           placeCaption(i);
           fill(steps[i]);
           inner.setAttribute('data-swap', 'false');
@@ -1399,21 +1426,34 @@ const facts = [
             placeCaption(0);
           });
           head.style.opacity = '';
+          light(0);
           fill(steps[0]);
           inner.setAttribute('data-swap', 'false');
         }, FADE);
       }
 
-      // Moves the ticker and lights the milestone tick. The caption is left
-      // where it is - the callers decide when it catches up.
+      // Positions are line indices as a share of the ruler's width, so the first
+      // line sits on the left edge and the last one on the right
+      function pctAt(line) {
+        return (line / (lines - 1)) * 100;
+      }
+
+      // Sends the ticker off and collapses the line it is leaving. Extending the
+      // new one is light()'s job, which the callers fire as the ticker lands: the
+      // line growing has to look like the ticker arriving, and a line that shot
+      // up before it got there would read as the ruler answering ahead of it.
       function place(i) {
         index = i;
         root.style.setProperty('--qc-tl-pct', String(steps[i].pct));
-        marks.forEach(function (mark, at) {
-          mark.classList.toggle('is-active', at === i);
-          if (at === i) mark.setAttribute('aria-current', 'true');
-          else mark.removeAttribute('aria-current');
+        marks.forEach(function (mark) {
+          mark.classList.toggle('is-active', false);
+          mark.removeAttribute('aria-current');
         });
+      }
+
+      function light(i) {
+        marks[i].classList.toggle('is-active', true);
+        marks[i].setAttribute('aria-current', 'true');
       }
 
       function placeCaption(i) {
@@ -1484,50 +1524,19 @@ const facts = [
       return found ? found.textContent.trim() : '';
     }
 
-    function pctOf(ms, from, to) {
-      return ((ms - from) / (to - from)) * 100;
+    // A date, as a count of months, which is the only part of it the ruler uses:
+    // a milestone belongs to a month and sits on its line, so the day it fell on
+    // has nowhere to go. Read straight off the string rather than through Date,
+    // which would drag a timezone into an arithmetic that has no time in it -
+    // and used to cost the ruler a day's drift west of Greenwich.
+    function monthOf(text) {
+      var parts = /^(\d{4})-(\d{2})/.exec(text || '');
+      if (!parts) return null;
+      return Number(parts[1]) * 12 + (Number(parts[2]) - 1);
     }
 
-    // The dates are YYYY-MM-DD, which parses as UTC midnight, so the ruler is
-    // laid out in UTC as well. Local getters here would drift every tick by a
-    // day for readers west of Greenwich.
-    function monthLabel(ms) {
-      var when = new Date(ms);
-      return MONTHS[when.getUTCMonth()] + ' ' + when.getUTCFullYear();
-    }
-
-    function eachYearStart(from, to, forEach) {
-      var year = new Date(from).getUTCFullYear();
-      // A span that opens mid-year still has to name the year it opens in, or
-      // the ruler runs unlabelled until the next January. That one is pinned to
-      // the left edge: it annotates where the ruler starts, not a January.
-      if (Date.UTC(year, 0, 1) < from) forEach(from, year);
-      for (;;) {
-        var ms = Date.UTC(year, 0, 1);
-        if (ms > to) return;
-        if (ms >= from) forEach(ms, year);
-        year += 1;
-      }
-    }
-
-    function eachQuarterStart(from, to, forEach) {
-      var year = new Date(from).getUTCFullYear();
-      for (;;) {
-        for (var month = 0; month < 12; month += 3) {
-          var ms = Date.UTC(year, month, 1);
-          if (ms > to) return;
-          if (ms >= from) forEach(ms);
-        }
-        year += 1;
-      }
-    }
-
-    // Stable pseudo-random in [0, 1). The tick texture has to come out
-    // identical on every render, so nothing here may touch time or
-    // Math.random - the index is the whole input.
-    function noise(i) {
-      var x = Math.sin((i + 1) * 12.9898) * 43758.5453;
-      return x - Math.floor(x);
+    function monthLabel(month) {
+      return MONTHS[month % 12] + ' ' + Math.floor(month / 12);
     }
   })();
 
