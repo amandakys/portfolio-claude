@@ -469,6 +469,168 @@ const facts = [
     text-align: left;
   }
 
+  /* --- Platform diagram: agent pills ------------------------------------
+     Each agent is a self-contained pill. Nothing joins them to each other -
+     the dashed wrapper around the group is what says "pick from these". They
+     wrap rather than sit on a grid, so the set reads as a set and not as a
+     fixed number of slots. */
+  .qc-article .qc-agent {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    border-radius: 999px;
+    background: #FDFBF5;
+    border: 1px solid rgba(25, 34, 77, 0.09);
+    padding: 0.3125rem 0.75rem 0.3125rem 0.375rem;
+  }
+
+  .qc-article .qc-agent-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(25, 34, 77, 0.12);
+    color: rgba(25, 34, 77, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qc-article .qc-agent-icon svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    display: block;
+  }
+
+  .qc-article .qc-agent p {
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.2;
+    color: rgba(25, 34, 77, 0.9);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  /* --- Platform diagram: the connector overlays --------------------------
+     The lines that join one layer's objects to the next are not bands between
+     the layer cards - they are overlays drawn on top of them, so a line can
+     start inside one card and finish inside another. Each overlay is a sibling
+     of the cards inside a relative wrapper, and it borrows the geometry of the
+     cards it covers so the lines can be placed as plain percentages of the
+     column the objects live in rather than of the whole figure: the lower
+     three layers are two-column rows, so that overlay repeats their grid (two
+     columns, the same gap, the same horizontal padding) with an empty first
+     cell; the top layer is one full-width card, so its overlay is just the
+     same horizontal padding.
+
+     Coordinates are percentages both ways: viewBox="0 0 100 100" with
+     preserveAspectRatio="none" over a box that spans the whole figure, so x is
+     a percentage of the column and y a percentage of the figure's height.
+     Nothing is pinned to a pixel height, so the routing survives the cards
+     growing or shrinking - but the y values are derived from measured offsets,
+     so reflowing the copy inside the boxes means re-deriving them.
+
+     Curves are safe here where they weren't in a short band: the x and y
+     scales are within about 2x of each other, and every curve has its control
+     points sharing an endpoint's x, so it leaves or arrives at each object
+     vertically and only fans out in between. Strokes still carry
+     vector-effect="non-scaling-stroke" to stay 1px under the stretch, and the
+     meeting dots are separate elements outside the svg so the stretch can't
+     turn them into ellipses. */
+  .qc-article .qc-flow-over {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The point everything converges to before it splits again */
+  .qc-article .qc-flow-node {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(25, 34, 77, 0.42);
+    transform: translate(-50%, -50%);
+  }
+
+  /* --- Platform diagram: the flow ----------------------------------------
+     One set of dots makes the whole journey bottom to top, changing count as
+     the diagram merges and splits: three leave the named integrations, arrive
+     as one at the first meeting point, two carry on into the data boxes, two
+     come back out and meet again, one goes into the agents, one comes out, and
+     two split off into the experiences.
+
+     Every dot moves at the same speed, so nothing here is a fixed beat: a stage
+     lasts as long as its own line is. The timeline is built backwards from each
+     landing, which is what lets the three lines converging on the first meeting
+     point arrive together despite the outer two being three times longer than
+     the middle one - they set off earlier. All of that is arithmetic on the
+     measured geometry, so the generator emits one set of keyframes per dot,
+     into a style block alongside the figure, and each dot names its own. Only
+     the shared parts are here.
+
+     A dot is an HTML span on a CSS motion path, not anything inside the svg.
+     Inside the svg it would have to be a zero-length round dash, because the
+     overlay is stretched (preserveAspectRatio="none") and anything with real
+     width comes out an ellipse - and a dash means non-scaling-stroke, whose
+     width *and* dash lengths are both measured by the browser in device pixels.
+     On a 2x display that makes every dash length worth half a CSS pixel, so a
+     dot calibrated in CSS pixels gets halfway along its line and vanishes;
+     pathLength can't rescue it either, being ignored once the stroke is
+     non-scaling. offset-distance is a percentage of the path, so 100% is the
+     line - whatever its length, on any display - and the calibration problem
+     goes away rather than being solved.
+
+     The generator emits each dot's path a second time in the overlay's own
+     pixel space, which is the one thing this costs: the dots assume a fixed
+     figure. It is one, at every width they're visible at.
+
+     The coral is the page's accent, and the only thing in the figure wearing it
+     - which is the point, since it's the one thing in there that moves. The
+     glow is three shadows: a tight ring to thicken the core, then two soft ones
+     to carry it out past the line. */
+  .qc-article .qc-flow-dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #FC6B55;
+    box-shadow: 0 0 0 1.5px rgba(252, 107, 85, 0.35),
+                0 0 8px 1px rgba(252, 107, 85, 0.55),
+                0 0 18px 5px rgba(252, 107, 85, 0.28);
+    offset-rotate: 0deg;
+    opacity: 0;
+    animation-duration: 9s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  /* The meeting dots react as the flow lands on them, so they share the period
+     and get the delay of whichever stage arrives at them. */
+  .qc-article .qc-flow-node {
+    animation: qc-flow-land-node 9s linear infinite;
+    animation-delay: calc(var(--qc-flow-delay, 0s) - 9s);
+  }
+
+  @keyframes qc-flow-land-node {
+    0%, 6%, 100% {
+      background: rgba(25, 34, 77, 0.42);
+      transform: translate(-50%, -50%) scale(1);
+    }
+    1.2% {
+      background: rgba(25, 34, 77, 0.8);
+      transform: translate(-50%, -50%) scale(1.6);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .qc-article .qc-flow-dot { display: none; }
+    .qc-article .qc-flow-node { animation: none; }
+  }
+
   /* Center all images including HTML img tags */
   .qc-article img {
     display: block;
