@@ -400,9 +400,9 @@ Then came the advocacy piece: these teams had never worked with a designer, nor 
 
 ## Impact and leverage
 
-The platform is now in use across core industries, from aerospace to mining, and has become central to how PhysicsX communicates its value to customers, investors, and partners.
+The platform is now in use at several major insurance companies and has become central to how QuantCo communicates its value to customers, investors, and partners.
 
-By creating clarity across tools, teams, and workflows, the platform helped PhysicsX shift from fragmented prototypes to a product mindset and from powerful models to composable, visible outcomes.
+By creating clarity across tools, teams, and workflows, the platform helped QuantCo shift from fragmented prototypes to a product mindset and from powerful models to composable, visible outcomes that had a clear path to integration with complex client systems.
 
 <figure>
 <!-- The timeline is authored as a plain dated list and nothing else. The ruler,
@@ -474,7 +474,7 @@ By creating clarity across tools, teams, and workflows, the platform helped Phys
 
 ## Reflection
 
-Designing the PhysicsX Platform meant operating across ambiguity and discipline. It required knowing when to formalise, when to stay fluid, and how to hold clarity without collapsing complexity.
+Designing the QuantCo platform meant operating across ambiguity and discipline. It required knowing when to formalise, when to stay fluid, and how to hold clarity without collapsing complexity.
 
 It was a platform-level design challenge in the truest sense not just in structure, but in influence.
 
