@@ -411,48 +411,63 @@ By creating clarity across tools, teams, and workflows, the platform helped Phys
      truth: edit, reorder or add a step here and the ruler follows. Without JS
      (or with reduced motion on) the list is what renders, which is why it is
      written to read as a list on its own.
-     data-start / data-end are the first and last month the ruler covers. Only
-     the year and month are read from any date here: the ruler's unit is a
-     month, and a step sits on a month line rather than somewhere inside it.
+     data-start / data-end are the first and last month the ruler covers.
      Every January inside the span is labelled, so July 2025 to January 2027
      carries a 2026 and a 2027. The room the first entry needs to be centred
      under its line comes from the ruler being inset inside the block rather
      than from the span - see --qc-tl-inset in QuantcoLayout.astro.
-     data-kind="minor" marks the smaller beats: a lighter line, a softer title
-     and less time on screen. Anything without it is a major step. -->
+     A step always lands on a line of the ruler, never between two. The month
+     puts it on that month's line, which is where nearly all of them sit and
+     what a first-of-the-month date means. The day is only read to pick one of
+     the month's four week lines, which is what tells the two September steps
+     apart - and a week is 9px on a laptop, so two steps that close together
+     read as one point on the ruler and only really differ in the caption.
+     data-kind="minor" marks the smaller beats: a lighter line and a softer
+     title. Anything without it is a major step. -->
 <div class="not-prose qc-timeline" data-qc-timeline data-start="2025-07-01" data-end="2027-01-01">
 <ol class="qc-tl-steps">
 <li class="qc-tl-step" data-date="2025-09-01" data-label="Sept 2025">
 <h4 class="qc-tl-step-title">Joined QuantCo</h4>
 <p class="qc-tl-step-desc">Joined as first designer to shape the platform experience</p>
 </li>
-<li class="qc-tl-step" data-kind="minor" data-date="2025-10-01" data-label="Oct 2025">
+<li class="qc-tl-step" data-kind="minor" data-date="2025-09-08" data-label="Sept 2025">
 <h4 class="qc-tl-step-title">Design embedded in delivery</h4>
 <p class="qc-tl-step-desc">Worked directly with customer teams to understand real workflows and constraints</p>
 </li>
-<li class="qc-tl-step" data-kind="minor" data-date="2025-12-01" data-label="Dec 2025">
+<li class="qc-tl-step" data-kind="minor" data-date="2025-11-01" data-label="Nov 2025">
+<h4 class="qc-tl-step-title">Initial framing</h4>
+<p class="qc-tl-step-desc">Synthesised delivery insights into core journeys and experience architecture</p>
+</li>
+<li class="qc-tl-step" data-date="2025-12-01" data-label="Dec 2025">
 <h4 class="qc-tl-step-title">A shared vision</h4>
 <p class="qc-tl-step-desc">Ran workshops across teams to define what a QuantCo platform could be</p>
 </li>
+<li class="qc-tl-step" data-kind="minor" data-date="2026-01-01" data-label="Jan 2026">
+<h4 class="qc-tl-step-title">Agentic exploration</h4>
+<p class="qc-tl-step-desc">Explored agent-based workflows and generative platform capabilities</p>
+</li>
 <li class="qc-tl-step" data-date="2026-02-01" data-label="Feb 2026">
+<h4 class="qc-tl-step-title">First MVP in production</h4>
+<p class="qc-tl-step-desc">The first release live with a client, not a prototype</p>
+</li>
+<li class="qc-tl-step" data-kind="minor" data-date="2026-03-01" data-label="Mar 2026">
 <h4 class="qc-tl-step-title">Roadmap and prioritisation</h4>
 <p class="qc-tl-step-desc">A framework holding client commitments and product bets in the same view</p>
 </li>
 <li class="qc-tl-step" data-kind="minor" data-date="2026-04-01" data-label="Apr 2026">
-<h4 class="qc-tl-step-title">Levels of automation</h4>
-<p class="qc-tl-step-desc">Interaction patterns for every level of human-in-the-loop an agent needs</p>
+<h4 class="qc-tl-step-title">Patterns for AI features</h4>
+<p class="qc-tl-step-desc">Extended the design system with patterns for integrating AI features</p>
 </li>
-<li class="qc-tl-step" data-date="2026-06-01" data-label="Jun 2026">
-<h4 class="qc-tl-step-title">The platform frame</h4>
-<p class="qc-tl-step-desc">One navigation system and design language for every team to build into</p>
+<li class="qc-tl-step" data-date="2026-05-01" data-label="May 2026">
+<h4 class="qc-tl-step-title">Levels of automation</h4>
+<p class="qc-tl-step-desc">One human-in-the-loop framework, standardised across every agentic tool</p>
 </li>
 <li class="qc-tl-step" data-date="2026-08-01" data-label="Aug 2026">
-<h4 class="qc-tl-step-title">Design shaping the product</h4>
-<p class="qc-tl-step-desc">From helping teams ship tools to shaping the claims product experience</p>
+<h4 class="qc-tl-step-title">The 2026 vision</h4>
+<p class="qc-tl-step-desc">A working prototype of the platform the whole company could build into</p>
 </li>
 </ol>
 </div>
-<figcaption>A year of platform work, from first designer to a product the whole company builds into</figcaption>
 </figure>
 
 ---

@@ -1149,9 +1149,12 @@ const facts = [
         // Anything outside the ruler's span is dropped rather than clamped to
         // an end, which would put a milestone at a date it didn't happen
         if (month === null || month < first || month > last) return;
-        // Which is what puts every step on a month line: the line is worked out
-        // from the month, so a step can't land between two of them
-        var line = (month - first) * WEEKS_PER_MONTH;
+        // A step lands on a line of the ruler, never between two: the month
+        // gives the month line and the day picks one of that month's four week
+        // lines off it. A first-of-the-month date is the month line itself,
+        // which is where most steps sit - the day is there for the ones that
+        // need to be told apart inside one month.
+        var line = (month - first) * WEEKS_PER_MONTH + weekOf(item.getAttribute('data-date'));
         steps.push({
           line: line,
           pct: pctAt(line),
@@ -1510,15 +1513,24 @@ const facts = [
       return found ? found.textContent.trim() : '';
     }
 
-    // A date, as a count of months, which is the only part of it the ruler uses:
-    // a milestone belongs to a month and sits on its line, so the day it fell on
-    // has nowhere to go. Read straight off the string rather than through Date,
-    // which would drag a timezone into an arithmetic that has no time in it -
-    // and used to cost the ruler a day's drift west of Greenwich.
+    // A date, as a count of months. Read straight off the string rather than
+    // through Date, which would drag a timezone into an arithmetic that has no
+    // time in it - and used to cost the ruler a day's drift west of Greenwich.
     function monthOf(text) {
       var parts = /^(\d{4})-(\d{2})/.exec(text || '');
       if (!parts) return null;
       return Number(parts[1]) * 12 + (Number(parts[2]) - 1);
+    }
+
+    // Which of a month's four week lines a date falls on. A month is four lines
+    // wide however long it really is, so the last few days of a long month
+    // share the fourth line rather than spilling into the next month's first.
+    // No day, or the first of the month, is the month line itself.
+    function weekOf(text) {
+      var parts = /^\d{4}-\d{2}-(\d{2})/.exec(text || '');
+      if (!parts) return 0;
+      var week = Math.floor((Number(parts[1]) - 1) / 7);
+      return Math.min(WEEKS_PER_MONTH - 1, Math.max(0, week));
     }
 
     function monthLabel(month) {
