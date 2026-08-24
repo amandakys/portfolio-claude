@@ -402,30 +402,8 @@ const facts = [
      leak onto the other project pages that still use ProjectLayout. */
 
   /* --- Section structure -------------------------------------------------
-     Each h2 opens a numbered chapter. The counter is driven by the markdown
-     so sections can be added or reordered without touching this layout. */
-  .qc-article {
-    counter-reset: section;
-  }
-
-  .qc-article h2 {
-    counter-increment: section;
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-  }
-
-  .qc-article h2::before {
-    content: counter(section, decimal-leading-zero);
-    font-family: var(--font-job-role);
-    font-size: 0.9rem;
-    letter-spacing: 0.15em;
-    color: #19224D;
-    opacity: 0.35;
-    /* Keep the number optically aligned with the heading's cap height */
-    transform: translateY(-0.35em);
-    flex-shrink: 0;
-  }
+     Each h2 opens a chapter; the markdown `---` separators are what mark the
+     breaks between them. */
 
   /* The markdown `---` separators become the chapter breaks */
   .qc-article hr {
