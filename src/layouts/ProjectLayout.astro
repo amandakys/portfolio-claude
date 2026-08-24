@@ -13,13 +13,16 @@ interface Props {
   headings?: Heading[];
 }
 
-const { entry, headings = [] } = Astro.props;
-const { title, tags, description, workplace } = entry.data;
+const { entry } = Astro.props;
+const { title, tags, description, workplace, role } = entry.data;
 const isProtected = entry.data.protected === true;
 const isWorkProject = !!workplace;
 
-// Filter to only h2 headings for the table of contents
-const tocHeadings = headings.filter(h => h.depth === 2);
+// Header metadata: role · company · year. Company defaults to the workplace,
+// year to the year of the project date. Empty parts are dropped.
+const company = entry.data.company ?? workplace;
+const year = entry.data.year ?? new Date(entry.data.date).getFullYear().toString();
+const metaParts = [role, company, year].filter(Boolean);
 ---
 
 <!doctype html>
@@ -42,146 +45,125 @@ const tocHeadings = headings.filter(h => h.depth === 2);
 
     <title>{title} | Amanda Koh</title>
   </head>
-  <body class="min-h-screen lg:overflow-hidden overflow-x-hidden">
+  <body class="min-h-screen overflow-x-hidden bg-[#FEFAEC]">
     {isProtected && <PasswordProtection />}
-    <div class="flex flex-col lg:flex-row lg:h-screen">
-      <!-- Left Side - Fixed on desktop, top on mobile -->
-      <aside class="w-full lg:w-[30%] bg-[#19224D] flex flex-col justify-between pt-0 px-8 pb-8 sm:px-12 sm:pb-12 lg:p-16 shrink-0 lg:overflow-y-auto relative">
-        <!-- Top row: Back link and hamburger menu - sticky on mobile -->
-        <div
-          id="project-top-bar"
-          class="lg:static fixed top-0 left-0 right-0 z-40 flex justify-between items-center px-4 py-2 sm:px-6 sm:py-3 lg:p-0 lg:mb-8 transition-all duration-300"
+
+    <!-- Top bar: back link + navigation -->
+    <div
+      id="project-top-bar"
+      class="sticky top-0 z-40 bg-[#FEFAEC]/85 backdrop-blur-sm flex justify-between items-center gap-4 px-4 py-3 sm:px-6 sm:py-4 lg:px-8"
+    >
+      <!-- Back link -->
+      <a
+        id="back-link"
+        href={isWorkProject ? "/#work" : "/projects"}
+        class="inline-flex items-center gap-2 font-job-role text-[#19224D]/60 tracking-wide text-sm hover:text-[#19224D] transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span id="back-label">{isWorkProject ? "Case Studies" : "Projects"}</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden lg:flex gap-6 lg:gap-8">
+        <a
+          href="/about"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
         >
-          <!-- Back link -->
-          <a
-            id="back-link"
-            href={isWorkProject ? "/#work" : "/projects"}
-            class="inline-flex items-center gap-2 font-job-role text-white/60 tracking-wide text-sm hover:text-white transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            <span id="back-label">{isWorkProject ? "Work" : "Projects"}</span>
-          </a>
+          About
+        </a>
+        <a
+          href="/#work"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          Case Studies
+        </a>
+        <a
+          href="/projects"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          Projects
+        </a>
+        <a
+          href="/cv"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          CV
+        </a>
+      </nav>
 
-          <!-- Mobile Hamburger Button -->
-          <button
-            id="project-menu-toggle"
-            class="lg:hidden p-2 text-white hover:opacity-80 transition-opacity"
-            aria-label="Toggle menu"
-            aria-expanded="false"
-          >
-            <svg id="project-hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            <svg id="project-close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- Spacer for fixed header on mobile -->
-        <div class="h-10 sm:h-12 lg:hidden"></div>
-
-        <div>
-
-          <!-- Title -->
-          <h1 class="font-ebrula text-5xl sm:text-6xl md:text-7xl lg:text-[80px] text-[#FC6B55] leading-tight">
-            {title}
-          </h1>
-
-          <!-- Tags and Workplace -->
-          {(tags && tags.length > 0) || workplace ? (
-            <div class="flex flex-wrap items-center justify-between gap-2 mt-3 lg:mt-4">
-              <div class="flex flex-wrap gap-2">
-                {tags && tags.map((tag: string) => (
-                  <span class="font-body text-sm px-3 py-1.5 bg-white/20 text-white/80 rounded">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              {workplace && (
-                <p class="font-body text-white/60 text-sm">
-                  {workplace}
-                </p>
-              )}
-            </div>
-          ) : null}
-
-          <!-- Description -->
-          {description && (
-            <p class="font-body text-white/80 text-base sm:text-lg mt-4 lg:mt-6 leading-relaxed">
-              {description}
-            </p>
-          )}
-        </div>
-
-        <!-- Table of Contents -->
-        {tocHeadings.length > 0 && (
-          <nav class="hidden lg:block mt-8 text-right">
-            <h2 class="font-job-role text-white/40 tracking-wide text-xs uppercase mb-3">Contents</h2>
-            <ul class="space-y-2">
-              {tocHeadings.map((heading) => (
-                <li>
-                  <a
-                    href={`#${heading.slug}`}
-                    class="font-body text-white/60 text-sm hover:text-white transition-colors block"
-                  >
-                    {heading.text}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
-      </aside>
-
-      <!-- Right Side - Scrollable -->
-      <main id="main-content" class="flex-1 bg-[#FEFAEC] lg:overflow-y-auto scroll-smooth">
-        <!-- Navigation - Desktop only -->
-        <nav class="sticky top-0 bg-[#FEFAEC]/80 backdrop-blur-sm z-10 hidden lg:flex justify-end gap-4 sm:gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8">
-          <a
-            href="/about"
-            class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
-          >
-            About
-          </a>
-          <a
-            href="/#work"
-            class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
-          >
-            Work
-          </a>
-          <a
-            href="/projects"
-            class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
-          >
-            Projects
-          </a>
-          <a
-            href="/cv"
-            class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
-          >
-            CV
-          </a>
-        </nav>
-
-        <!-- Content -->
-        <article class="px-8 sm:px-12 lg:px-20 xl:px-28 pb-16 prose prose-lg prose-gray max-w-none
-          prose-headings:font-heading prose-headings:text-[#FC6B55]
-          prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:mt-12 prose-h2:mb-6
-          prose-h3:text-xl prose-h3:sm:text-2xl
-          prose-h4:text-lg prose-h4:sm:text-xl prose-h4:font-semibold prose-h4:text-[#FC6B55] prose-h4:font-heading
-          prose-p:font-body prose-p:text-gray-700 prose-p:leading-relaxed
-          prose-a:text-[#FC6B55] prose-a:no-underline prose-a:hover:underline
-          prose-strong:text-[#19224D]
-          prose-img:rounded-lg prose-img:shadow-md prose-img:mx-auto
-          prose-ul:font-body prose-li:text-gray-700
-        ">
-          <slot />
-        </article>
-      </main>
+      <!-- Mobile Hamburger Button -->
+      <button
+        id="project-menu-toggle"
+        class="lg:hidden p-2 text-[#19224D] hover:opacity-70 transition-opacity"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+      >
+        <svg id="project-hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="project-close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
+
+    <main id="main-content" class="mx-auto w-full max-w-4xl px-6 sm:px-8 scroll-smooth">
+      <!-- Header -->
+      <header class="pt-8 sm:pt-12 lg:pt-16 text-center">
+        <h1 class="font-ebrula text-5xl sm:text-6xl md:text-7xl text-[#FC6B55] leading-tight">
+          {title}
+        </h1>
+
+        <!-- Role, company, year -->
+        {metaParts.length > 0 && (
+          <p class="font-job-role text-[#19224D]/70 tracking-wide text-sm sm:text-base mt-4 sm:mt-5">
+            {metaParts.map((part, i) => (
+              <>
+                {i > 0 && <span class="text-[#19224D]/30 mx-2">&middot;</span>}
+                {part}
+              </>
+            ))}
+          </p>
+        )}
+
+        <!-- Description -->
+        {description && (
+          <p class="font-body text-gray-700 text-base sm:text-lg mt-4 sm:mt-6 leading-relaxed">
+            {description}
+          </p>
+        )}
+
+        <!-- Tags -->
+        {tags && tags.length > 0 && (
+          <div class="flex flex-wrap items-center justify-center gap-2 mt-5 sm:mt-6">
+            {tags.map((tag: string) => (
+              <span class="font-body text-sm px-3 py-1.5 bg-[#19224D]/10 text-[#19224D]/80 rounded">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <hr class="border-t border-[#19224D]/15 mt-8 sm:mt-10" />
+      </header>
+
+      <!-- Content -->
+      <article class="pb-16 prose prose-lg prose-gray max-w-none
+        prose-headings:font-heading prose-headings:text-[#FC6B55]
+        prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:mt-12 prose-h2:mb-6
+        prose-h3:text-xl prose-h3:sm:text-2xl
+        prose-h4:text-lg prose-h4:sm:text-xl prose-h4:font-semibold prose-h4:text-[#FC6B55] prose-h4:font-heading
+        prose-p:font-body prose-p:text-gray-700 prose-p:leading-relaxed
+        prose-a:text-[#FC6B55] prose-a:no-underline prose-a:hover:underline
+        prose-strong:text-[#19224D]
+        prose-img:rounded-lg prose-img:shadow-md prose-img:mx-auto
+        prose-ul:font-body prose-li:text-gray-700
+      ">
+        <slot />
+      </article>
+    </main>
 
     <!-- Mobile Menu Overlay -->
     <div
@@ -209,7 +191,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
         href="/#work"
         class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
       >
-        Work
+        Case Studies
       </a>
       <a
         href="/projects"
@@ -246,6 +228,17 @@ const tocHeadings = headings.filter(h => h.depth === 2);
     margin-left: auto;
     margin-right: auto;
   }
+
+  /* Some content sets inline max-widths wider than the column - clamp them
+     so they can't overflow (and get clipped by overflow-x-hidden) */
+  article [style*="max-width"] {
+    max-width: 100% !important;
+  }
+
+  /* Offset anchor targets for the sticky top bar */
+  article :target {
+    scroll-margin-top: 6rem;
+  }
 </style>
 
 <script is:inline>
@@ -261,50 +254,8 @@ const tocHeadings = headings.filter(h => h.depth === 2);
       backLabel.textContent = 'Projects';
     } else if (from === 'work' && backLink && backLabel) {
       backLink.href = '/#work';
-      backLabel.textContent = 'Work';
+      backLabel.textContent = 'Case Studies';
     }
-  })();
-
-  // Handle TOC anchor clicks for scrollable container
-  (function() {
-    const tocLinks = document.querySelectorAll('aside nav a[href^="#"]');
-    const mainContent = document.getElementById('main-content');
-
-    tocLinks.forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        const href = link.getAttribute('href');
-        if (!href || !mainContent) return;
-
-        const targetId = href.substring(1);
-        const targetElement = document.getElementById(targetId);
-
-        if (targetElement) {
-          e.preventDefault();
-          const navHeight = 80; // Account for sticky nav
-          const targetPosition = targetElement.offsetTop - navHeight;
-          mainContent.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
-  })();
-
-  // Sticky top bar background on scroll
-  (function() {
-    const topBar = document.getElementById('project-top-bar');
-
-    function updateTopBarBackground() {
-      if (window.scrollY > 20) {
-        topBar?.classList.add('bg-[#19224D]/90', 'backdrop-blur-md');
-      } else {
-        topBar?.classList.remove('bg-[#19224D]/90', 'backdrop-blur-md');
-      }
-    }
-
-    window.addEventListener('scroll', updateTopBarBackground);
-    updateTopBarBackground();
   })();
 
   // Mobile menu toggle
@@ -323,6 +274,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
       mobileMenu?.classList.add('translate-x-0');
       hamburgerIcon?.classList.add('hidden');
       closeIcon?.classList.remove('hidden');
+      menuToggle?.setAttribute('aria-expanded', 'true');
       document.body.style.overflow = 'hidden';
     }
 
@@ -331,6 +283,7 @@ const tocHeadings = headings.filter(h => h.depth === 2);
       mobileMenu?.classList.add('translate-x-full');
       hamburgerIcon?.classList.remove('hidden');
       closeIcon?.classList.add('hidden');
+      menuToggle?.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
       setTimeout(function() {
         mobileMenu?.classList.add('hidden');

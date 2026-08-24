@@ -7,6 +7,9 @@ casestudy: true
 showOnHomepage: true
 tags: ["research", "UX", "VR", "coding"]
 workplace: Imperial College London
+role: "Researcher"
+company: "Imperial College London"
+year: "2018"
 ---
 ## Overview 
 

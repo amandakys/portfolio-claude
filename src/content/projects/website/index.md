@@ -6,6 +6,9 @@ description: "Experimenting with vibe coding tools for my portfolio update"
 casestudy: true
 showOnHomepage: true
 tags: ["coding", "design"]
+role: "Designer & Developer"
+company: "Personal project"
+year: "2025"
 ---
 
 ## The Context 

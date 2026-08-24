@@ -7,6 +7,8 @@ casestudy: true
 showOnHomepage: true
 tags: ["research", "qualitative", "AR/VR"]
 workplace: ISIR, Sorbonne Université 
+role: "Researcher"
+year: "2024 — 2025"
 ---
 
 ## Context

@@ -1,47 +1,55 @@
 import { useEffect, useRef, useState } from 'react';
 
+// Most recent first
 const milestones = [
   {
-    title: 'BEng Computing',
-    description: 'Imperial College London',
-    side: 'right',
-    annotation: "an intense degree, but I quickly realised software engineering might not be for me. I used side projects as a creative outlet, exploring product and graphic design"
-  },
-  {
-    title: 'UX Engineer',
-    description: 'Improbable Worlds Ltd',
-    side: 'left',
-    annotation: "my first job! I joined as a front-end developer, but gradually took on more design responsibilities. Here I confirmed my interest in product design."
-  },
-  {
     title: 'First Designer',
-    description: 'Maven Securities Ltd',
+    description: 'QuantCo',
+    years: '2025 —',
     side: 'right',
-    annotation: "my first design role! they liked my technical background and trusted me to design an internal trading platform from scratch."
-  },
-  {
-    title: 'MSc Human Computer Interaction',
-    description: 'UCL',
-    side: 'left',
-    annotation: "I went back to school to formalise my design knowledge and explore research. Obsessed with AR/VR, I wanted to explore its possibilities."
-  },
-  {
-    title: 'Technical UX Designer',
-    description: 'QuantumBlack, AI by McKinsey',
-    side: 'right',
-    annotation: "I joined enticed by the prospect of working with other designers, and applying design methods to software development. But, I learned that building and the visual aspect of design was really important to me."
+    annotation: "back to building design from the ground up, this time at an AI company. Excited to dive into product strategy for AI-integrated products!"
   },
   {
     title: 'Researcher in AR/VR',
     description: 'Sorbonne Université',
+    years: '2024 — 2025',
     side: 'left',
     annotation: "a research stint exploring spatial interfaces with the HoloLens 2. I designed context-adaptive interfaces suitable for handsfree use. Observing surgeries to understand interaction constraints was a highlight."
   },
   {
-    title: 'First Designer',
-    description: 'QuantCo',
+    title: 'Technical UX Designer',
+    description: 'QuantumBlack, AI by McKinsey',
+    years: '2022 — 2024',
     side: 'right',
-    annotation: "back to building design from the ground up, this time at an AI company. Excited to dive into product strategy for AI-integrated products!"
+    annotation: "I joined enticed by the prospect of working with other designers, and applying design methods to software development. But, I learned that building and the visual aspect of design was really important to me."
+  },
+  {
+    title: 'MSc Human Computer Interaction',
+    description: 'UCL',
+    years: '2020 — 2022',
+    side: 'left',
+    annotation: "I went back to school to formalise my design knowledge and explore research. Obsessed with AR/VR, I wanted to explore its possibilities."
+  },
+  {
+    title: 'First Designer',
+    description: 'Maven Securities Ltd',
+    years: '2020 — 2022',
+    side: 'right',
+    annotation: "my first design role! they liked my technical background and trusted me to design an internal trading platform from scratch."
+  },
+  {
+    title: 'UX Engineer',
+    description: 'Improbable Worlds Ltd',
+    years: '2018 — 2020',
+    side: 'left',
+    annotation: "my first job! I joined as a front-end developer, but gradually took on more design responsibilities. Here I confirmed my interest in product design."
+  },
+  {
+    title: 'BEng Computing',
+    description: 'Imperial College London',
+    years: '2015 — 2018',
+    side: 'right',
+    annotation: "an intense degree, but I quickly realised software engineering might not be for me. I used side projects as a creative outlet, exploring product and graphic design"
   }
 ];
 
@@ -244,6 +252,11 @@ function Timeline() {
             >
               <div className="group/tag relative">
                 <div className="bg-white/10 backdrop-blur-sm px-5 py-3 cursor-pointer transition-all duration-300 group-hover/tag:bg-white/20 relative z-10">
+                  {milestone.years && (
+                    <p className="font-job-role text-white/50 tracking-wide text-xs mb-1">
+                      {milestone.years}
+                    </p>
+                  )}
                   <h3 className="font-heading text-white text-base leading-tight">
                     {milestone.title}
                   </h3>
@@ -297,6 +310,11 @@ function Timeline() {
                   paddingRight: milestone.side === 'left' ? '2.5rem' : '1.75rem',
                 }}
               >
+                {milestone.years && (
+                  <p className="font-job-role text-white/50 tracking-wide text-xs mb-1">
+                    {milestone.years}
+                  </p>
+                )}
                 <h3 className="font-heading text-white text-xl leading-tight">
                   {milestone.title}
                 </h3>

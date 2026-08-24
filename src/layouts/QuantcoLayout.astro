@@ -1,0 +1,1576 @@
+---
+/**
+ * Experimental case-study layout, currently used by the QuantCo page only.
+ * Forked from ProjectLayout.astro - if this treatment sticks, fold it back
+ * into ProjectLayout rather than adding a third layout.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import PasswordProtection from '../components/PasswordProtection.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  headings?: Heading[];
+}
+
+const { entry } = Astro.props;
+const { title, tags, description, workplace, role, thumbnail, questions, focus } = entry.data;
+const isProtected = entry.data.protected === true;
+const isWorkProject = !!workplace;
+
+// The on-page heading can differ from the listing-card title
+const heading = entry.data.pageTitle ?? title;
+
+const company = entry.data.company ?? workplace;
+const year = entry.data.year ?? new Date(entry.data.date).getFullYear().toString();
+
+// Header metadata is laid out as a labelled grid rather than a single meta
+// line, so each fact gets its own column. Empty entries are dropped.
+const focusValues = focus ?? tags;
+const facts = [
+  { label: 'Role', value: role },
+  { label: 'Company', value: company },
+  { label: 'Timeline', value: year },
+  { label: 'Focus', value: focusValues && focusValues.length > 0 ? focusValues.join(', ') : undefined },
+].filter((f) => Boolean(f.value));
+---
+
+<!doctype html>
+<html lang="en" class="overflow-x-hidden">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={entry.data.description} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Preload custom fonts to reduce FOUT -->
+    <link rel="preload" href="/fonts/EbrulaVintageDemo-Regular.otf" as="font" type="font/otf" crossorigin />
+    <link rel="preload" href="/fonts/Roslindale-DisplayCondensedBold-Testing.otf" as="font" type="font/otf" crossorigin />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Square+Peg&family=Staatliches&display=swap" rel="stylesheet" />
+
+    <title>{heading} | Amanda Koh</title>
+  </head>
+  <body class="min-h-screen overflow-x-hidden bg-[#FEFAEC]">
+    {isProtected && <PasswordProtection />}
+
+    <!-- Top bar: back link + navigation -->
+    <div
+      id="project-top-bar"
+      class="sticky top-0 z-40 bg-[#FEFAEC]/85 backdrop-blur-sm flex justify-between items-center gap-4 px-4 py-3 sm:px-6 sm:py-4 lg:px-8"
+    >
+      <!-- Back link -->
+      <a
+        id="back-link"
+        href={isWorkProject ? "/#work" : "/projects"}
+        class="inline-flex items-center gap-2 font-job-role text-[#19224D]/60 tracking-wide text-sm hover:text-[#19224D] transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span id="back-label">{isWorkProject ? "Case Studies" : "Projects"}</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden lg:flex gap-6 lg:gap-8">
+        <a
+          href="/about"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          About
+        </a>
+        <a
+          href="/#work"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          Case Studies
+        </a>
+        <a
+          href="/projects"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          Projects
+        </a>
+        <a
+          href="/cv"
+          class="font-job-role text-[#19224D] tracking-wide text-sm sm:text-base hover:opacity-70 transition-opacity"
+        >
+          CV
+        </a>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button
+        id="project-menu-toggle"
+        class="lg:hidden p-2 text-[#19224D] hover:opacity-70 transition-opacity"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+      >
+        <svg id="project-hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="project-close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <main id="main-content" class="scroll-smooth">
+      <!-- Hero: left-aligned title, lead paragraph, then a labelled fact grid -->
+      <header class="mx-auto w-full max-w-5xl px-6 sm:px-8 pt-6 sm:pt-10 lg:pt-14 text-center">
+        <h1 class="font-ebrula text-[#FC6B55] text-5xl sm:text-6xl lg:text-7xl leading-[1.05] mx-auto max-w-4xl">
+          {heading}
+        </h1>
+
+        {description && (
+          <p class="font-body text-[#19224D]/80 text-lg sm:text-xl lg:text-2xl leading-relaxed mt-6 sm:mt-8 mx-auto max-w-3xl text-balance">
+            {description}
+          </p>
+        )}
+
+        {facts.length > 0 && (
+          <dl class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6 mt-10 sm:mt-12 pt-6 border-t border-[#19224D]/15">
+            {facts.map((fact) => (
+              <div>
+                <dt class="font-job-role text-[#19224D]/45 tracking-[0.15em] uppercase text-[0.65rem] sm:text-xs">
+                  {fact.label}
+                </dt>
+                <dd class="font-body text-[#19224D] text-sm sm:text-base mt-1.5 leading-snug">
+                  {fact.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </header>
+
+      <!-- Hero image, aligned to the header block and set inside a double
+           rule. The image itself is left flat - no vignette or shadow. -->
+      {thumbnail && (
+        <div class="mx-auto w-full max-w-5xl px-6 sm:px-8 mt-12 sm:mt-16">
+          <div class="qc-hero-frame">
+            <div class="qc-hero-inner">
+              <Image
+                src={thumbnail}
+                alt={`${heading} - project cover`}
+                widths={[960, 1920]}
+                sizes="(min-width: 1024px) 960px, 100vw"
+                class="w-full h-auto block"
+                loading="eager"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <!-- Framing questions: centred, one per line. Words are split at build
+           time so the full text is in the HTML, then rise and unblur on
+           scroll. Each word carries its own delay, accumulated across
+           questions so the three lines read in sequence. -->
+      {questions && questions.length > 0 && (
+        <section
+          id="qc-questions"
+          class="qc-questions mx-auto w-full max-w-5xl px-6 sm:px-8 mt-20 sm:mt-28 text-center"
+        >
+          <p class="qc-q-label font-job-role text-[#19224D]/45 tracking-[0.2em] uppercase text-xs sm:text-sm">
+            The Big Questions
+          </p>
+
+          <div class="mt-6 sm:mt-8">
+            {questions.map((question: string, qi: number) => {
+              const words = question.split(' ');
+              // Questions overlap: the next line starts before the previous
+              // has finished, so the sequence keeps moving.
+              const questionOffset = qi * 800;
+              return (
+                /* nowrap only from lg up - below that the questions are too
+                   long for one line and must wrap rather than overflow */
+                <p class="qc-question font-heading italic text-[#19224D] text-xl sm:text-2xl leading-[1.35] text-balance not-first:mt-2 sm:not-first:mt-3">
+                  {words.map((word, wi) => (
+                    <>
+                      <span class="qc-word">
+                        <span
+                          class="qc-word-inner"
+                          style={`--qc-delay: ${questionOffset + wi * 90}ms`}
+                        >{word}</span>
+                      </span>
+                      {wi < words.length - 1 ? ' ' : ''}
+                    </>
+                  ))}
+                </p>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <!-- Content -->
+      <article class="qc-article mx-auto w-full max-w-3xl px-6 sm:px-8 mt-20 sm:mt-28 pb-24 prose prose-lg prose-gray
+        prose-headings:font-heading prose-headings:text-[#FC6B55]
+        prose-h2:text-3xl prose-h2:sm:text-4xl prose-h2:mt-0 prose-h2:mb-8
+        prose-h3:text-xl prose-h3:sm:text-2xl prose-h3:mt-12
+        prose-h4:text-lg prose-h4:sm:text-xl prose-h4:font-semibold prose-h4:text-[#FC6B55] prose-h4:font-heading
+        prose-p:font-body prose-p:text-gray-700 prose-p:leading-relaxed
+        prose-a:text-[#FC6B55] prose-a:no-underline prose-a:hover:underline
+        prose-strong:text-[#19224D]
+        prose-img:mx-auto
+        prose-ul:font-body prose-li:text-gray-700
+      ">
+        <slot />
+      </article>
+    </main>
+
+    <!-- Mobile Menu Overlay -->
+    <div
+      id="project-mobile-menu"
+      class="fixed inset-0 z-50 bg-[#19224D] flex-col items-center justify-center gap-8 transform translate-x-full transition-transform duration-300 ease-in-out hidden lg:hidden"
+    >
+      <!-- Close button in top right -->
+      <button
+        id="project-menu-close"
+        class="absolute top-6 right-6 p-2 text-white hover:opacity-80 transition-opacity"
+        aria-label="Close menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <a
+        href="/about"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        About
+      </a>
+      <a
+        href="/#work"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        Case Studies
+      </a>
+      <a
+        href="/projects"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        Projects
+      </a>
+      <a
+        href="/cv"
+        class="font-job-role tracking-wide text-2xl text-white hover:opacity-80 transition-opacity"
+      >
+        CV
+      </a>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+
+  /* --- Framing questions -------------------------------------------------
+     Each question sits on a single unbroken line from lg up. The longest is
+     ~85 characters, so the type scales with the viewport (via vw) to stay on
+     one line instead of being clamped to a fixed size that would overflow. */
+  @media (min-width: 1024px) {
+    .qc-question {
+      white-space: nowrap;
+      text-wrap: nowrap;
+      /* Italic Roslindale runs narrower than the upright, which buys more size
+         at the same line length. The vw factor is what keeps the longest
+         question on one line - raising the ceiling alone won't do it.
+         The longest question ("What does AI look like...", 87 chars) measures
+         33.3em in this face, and the column now caps at 960px (max-w-5xl less
+         the 2rem gutters) to match the hero, so anything above ~1.8rem
+         overflows. The 1.5rem ceiling leaves it filling ~83% of the line. */
+      font-size: clamp(1.05rem, 1.5vw, 1.5rem);
+    }
+  }
+
+  /* --- Hero frame --------------------------------------------------------
+     A double rule: an outer line and an inner line around the image. The
+     channel between them is unfilled, so the cream page shows through - no
+     tint, glow or shadow, just the two lines.
+
+     Both rules match the dividers elsewhere on the page (the fact-grid border
+     and the article's hr): navy at 15%, which reads as grey against cream. */
+  .qc-hero-frame {
+    padding: 0.5rem;
+    border-radius: 0.875rem;
+    border: 1px solid rgba(25, 34, 77, 0.15);
+  }
+
+  @media (min-width: 640px) {
+    .qc-hero-frame {
+      padding: 0.625rem;
+      border-radius: 1rem;
+    }
+  }
+
+  /* The second rule, and the clip for the image. Overflow hidden is safe here
+     (unlike on the questions) since nothing needs to spill outside. Sits a
+     little darker than the outer rule - it falls against the image rather
+     than cream, so a matching alpha would read lighter of the two. */
+  .qc-hero-inner {
+    border: 1px solid rgba(25, 34, 77, 0.3);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .qc-hero-shade {
+    box-shadow:
+      inset 0 3px 10px rgba(25, 34, 77, 0.55),
+      inset 0 -1px 3px rgba(25, 34, 77, 0.3),
+      inset 3px 0 8px -2px rgba(25, 34, 77, 0.4),
+      inset -3px 0 8px -2px rgba(25, 34, 77, 0.4);
+  }
+
+  /* --- Word-by-word rise -------------------------------------------------
+     Each word travels up from below while unblurring. No clipping mask: the
+     blur has to spill past the word's box to read properly, which overflow
+     hidden would cut off. */
+  .qc-word {
+    display: inline-block;
+  }
+
+  .qc-word-inner {
+    display: inline-block;
+    transform: translateY(1.4em);
+    opacity: 0;
+    filter: blur(12px);
+    will-change: transform, filter, opacity;
+  }
+
+  /* Only animate once the observer marks the section visible - without this
+     the words would finish rising before the reader scrolls to them */
+  .qc-questions[data-revealed='true'] .qc-word-inner {
+    animation: qc-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--qc-delay, 0ms);
+  }
+
+  .qc-q-label {
+    opacity: 0;
+    transition: opacity 500ms ease;
+  }
+
+  .qc-questions[data-revealed='true'] .qc-q-label {
+    opacity: 1;
+  }
+
+  @keyframes qc-rise {
+    from {
+      transform: translateY(1.4em);
+      opacity: 0;
+      filter: blur(12px);
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  /* No-JS fallback: without the observer the words would never rise, so show
+     them outright rather than leaving the section blank */
+  .qc-questions:not([data-observed='true']) .qc-word-inner {
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+
+  .qc-questions:not([data-observed='true']) .qc-q-label {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Words appear in place - the staggered reveal is dropped entirely */
+    .qc-word-inner {
+      transform: none;
+      opacity: 1;
+      filter: none;
+    }
+
+    .qc-questions[data-revealed='true'] .qc-word-inner {
+      animation: none;
+    }
+
+    .qc-q-label {
+      opacity: 1;
+      transition: none;
+    }
+  }
+
+  /* Every rule here is scoped to .qc-article: Astro bundles the global styles
+     of all layouts into one stylesheet, so unscoped `article` selectors would
+     leak onto the other project pages that still use ProjectLayout. */
+
+  /* --- Section structure -------------------------------------------------
+     Each h2 opens a chapter; the markdown `---` separators are what mark the
+     breaks between them. */
+
+  /* The markdown `---` separators become the chapter breaks */
+  .qc-article hr {
+    border: 0;
+    border-top: 1px solid rgba(25, 34, 77, 0.15);
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+  }
+
+  /* --- Figures break out of the reading column --------------------------- */
+  .qc-article figure {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .qc-article figure {
+      width: calc(100% + 8rem);
+      margin-left: -4rem;
+      margin-right: -4rem;
+    }
+  }
+
+  .qc-article figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .qc-article figcaption,
+  .qc-article p[style*="font-size: 0.8em"] {
+    position: static !important;
+    top: auto !important;
+    margin-top: 1rem !important;
+    margin-bottom: 0 !important;
+    color: #6b7280 !important;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    /* Centred under the figure, on a measure narrower than the figure itself -
+       a caption set across the full breakout width is too long a line to read. */
+    text-align: center;
+    max-width: 42rem;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* --- Platform diagram: agent pills ------------------------------------
+     Each agent is a self-contained pill. Nothing joins them to each other -
+     the dashed wrapper around the group is what says "pick from these". They
+     wrap rather than sit on a grid, so the set reads as a set and not as a
+     fixed number of slots. */
+  .qc-article .qc-agent {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    border-radius: 999px;
+    background: #FDFBF5;
+    border: 1px solid rgba(25, 34, 77, 0.09);
+    padding: 0.3125rem 0.75rem 0.3125rem 0.375rem;
+  }
+
+  .qc-article .qc-agent-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(25, 34, 77, 0.12);
+    color: rgba(25, 34, 77, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qc-article .qc-agent-icon svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    display: block;
+  }
+
+  .qc-article .qc-agent p {
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.2;
+    color: rgba(25, 34, 77, 0.9);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  /* --- Platform diagram: the connector overlays --------------------------
+     The lines that join one layer's objects to the next are not bands between
+     the layer cards - they are overlays drawn on top of them, so a line can
+     start inside one card and finish inside another. Each overlay is a sibling
+     of the cards inside a relative wrapper, and it borrows the geometry of the
+     cards it covers so the lines can be placed as plain percentages of the
+     column the objects live in rather than of the whole figure: the lower
+     three layers are two-column rows, so that overlay repeats their grid (two
+     columns, the same gap, the same horizontal padding) with an empty first
+     cell; the top layer is one full-width card, so its overlay is just the
+     same horizontal padding.
+
+     Coordinates are percentages both ways: viewBox="0 0 100 100" with
+     preserveAspectRatio="none" over a box that spans the whole figure, so x is
+     a percentage of the column and y a percentage of the figure's height.
+     Nothing is pinned to a pixel height, so the routing survives the cards
+     growing or shrinking - but the y values are derived from measured offsets,
+     so reflowing the copy inside the boxes means re-deriving them.
+
+     Curves are safe here where they weren't in a short band: the x and y
+     scales are within about 2x of each other, and every curve has its control
+     points sharing an endpoint's x, so it leaves or arrives at each object
+     vertically and only fans out in between. Strokes still carry
+     vector-effect="non-scaling-stroke" to stay 1px under the stretch, and the
+     meeting dots are separate elements outside the svg so the stretch can't
+     turn them into ellipses. */
+  .qc-article .qc-flow-over {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The point everything converges to before it splits again */
+  .qc-article .qc-flow-node {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(25, 34, 77, 0.42);
+    transform: translate(-50%, -50%);
+  }
+
+  /* --- Platform diagram: the flow ----------------------------------------
+     One set of dots makes the whole journey bottom to top, changing count as
+     the diagram merges and splits: three leave the named integrations, arrive
+     as one at the first meeting point, two carry on into the data boxes, two
+     come back out and meet again, one goes into the agents, one comes out, and
+     two split off into the experiences.
+
+     Every dot moves at the same speed, so nothing here is a fixed beat: a stage
+     lasts as long as its own line is. The timeline is built backwards from each
+     landing, which is what lets the three lines converging on the first meeting
+     point arrive together despite the outer two being three times longer than
+     the middle one - they set off earlier. All of that is arithmetic on the
+     measured geometry, so the generator emits one set of keyframes per dot,
+     into a style block alongside the figure, and each dot names its own. Only
+     the shared parts are here.
+
+     A dot is an HTML span on a CSS motion path, not anything inside the svg.
+     Inside the svg it would have to be a zero-length round dash, because the
+     overlay is stretched (preserveAspectRatio="none") and anything with real
+     width comes out an ellipse - and a dash means non-scaling-stroke, whose
+     width *and* dash lengths are both measured by the browser in device pixels.
+     On a 2x display that makes every dash length worth half a CSS pixel, so a
+     dot calibrated in CSS pixels gets halfway along its line and vanishes;
+     pathLength can't rescue it either, being ignored once the stroke is
+     non-scaling. offset-distance is a percentage of the path, so 100% is the
+     line - whatever its length, on any display - and the calibration problem
+     goes away rather than being solved.
+
+     The generator emits each dot's path a second time in the overlay's own
+     pixel space, which is the one thing this costs: the dots assume a fixed
+     figure. It is one, at every width they're visible at.
+
+     The coral is the page's accent, and the only thing in the figure wearing it
+     - which is the point, since it's the one thing in there that moves. The
+     glow is three shadows: a tight ring to thicken the core, then two soft ones
+     to carry it out past the line. */
+  .qc-article .qc-flow-dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #FC6B55;
+    box-shadow: 0 0 0 1.5px rgba(252, 107, 85, 0.35),
+                0 0 8px 1px rgba(252, 107, 85, 0.55),
+                0 0 18px 5px rgba(252, 107, 85, 0.28);
+    offset-rotate: 0deg;
+    opacity: 0;
+    animation-duration: 9s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  /* The meeting dots react as the flow lands on them, so they share the period
+     and get the delay of whichever stage arrives at them. */
+  .qc-article .qc-flow-node {
+    animation: qc-flow-land-node 9s linear infinite;
+    animation-delay: calc(var(--qc-flow-delay, 0s) - 9s);
+  }
+
+  @keyframes qc-flow-land-node {
+    0%, 6%, 100% {
+      background: rgba(25, 34, 77, 0.42);
+      transform: translate(-50%, -50%) scale(1);
+    }
+    1.2% {
+      background: rgba(25, 34, 77, 0.8);
+      transform: translate(-50%, -50%) scale(1.6);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .qc-article .qc-flow-dot { display: none; }
+    .qc-article .qc-flow-node { animation: none; }
+  }
+
+  /* --- Impact timeline ---------------------------------------------------
+     A ruler with a ticker that walks from one milestone to the next, the
+     caption tracking along underneath it.
+
+     Every position here - ticks, year labels, the ticker, the caption - is a
+     percentage of the ruler's width, and the ticker's position travels through
+     one custom property (--qc-tl-pct, a bare number read as percent) that the
+     script sets. That is why there is no measuring or resize code: the ruler
+     works at any width and reflows on its own.
+
+     The ruler is a regular interval rather than a calendar: one line a week,
+     every fourth one longer for the start of a month. So a month is four weeks
+     wide here whatever the month is - real lengths of 28 to 31 days would put
+     the long lines at uneven distances, and the eye reads uneven spacing on a
+     ruler as a mistake rather than as February.
+
+     Lines are real elements rather than a repeating gradient because the ones
+     with a milestone on them have to be addressable - they are coral, they
+     extend when selected, and they are buttons - and a gradient can't give us a
+     handle on one of its own repeats.
+
+     The one property that transitions across a step is the ticker's `left`, a
+     plain percentage. The caption is moved instantly instead, which it can get
+     away with because it is faded out for the whole journey: it only becomes
+     visible once it has arrived. That also keeps clamp() (which does the
+     edge-of-ruler containment) out of any animation.
+
+     Which is why the ticker and the caption track two separate properties
+     rather than sharing one. They move at different moments - the ticker sets
+     off immediately, the caption jumps a beat later, once it has faded out. On
+     a single property the caption would slide sideways in full view before
+     fading, which is the one thing this arrangement is avoiding. */
+  .qc-article .qc-timeline {
+    /* Navy at low alpha for the bare ruler, matching the rules elsewhere on the
+       page. Coral is reserved for the months that have something in them, so
+       scanning the ruler for colour is the same as scanning it for content. */
+    --qc-tl-tick: rgba(25, 34, 77, 0.16);
+    --qc-tl-month: rgba(25, 34, 77, 0.34);
+    --qc-tl-head: #FC6B55;
+
+    --qc-tl-week-h: 12px;
+    --qc-tl-month-h: 22px;
+    /* A month with a milestone in it, before it is the selected one */
+    --qc-tl-mark-h: 30px;
+    /* And once it is: down to the caption, which is what the ticker's height
+       has to be too, so the two read as one line when it lands */
+    --qc-tl-head-h: 84px;
+
+    /* How far inside the block the ruler sits. The captions use the whole
+       block, so this is the room a milestone near either end borrows to be
+       centred - see .qc-tl-years and .qc-tl-cap-inner. */
+    --qc-tl-inset: 4rem;
+    /* The caption's width when there is room for it. If the inset can't cover
+       a milestone this close to an end, the caption narrows rather than
+       sliding off centre - see .qc-tl-cap-inner. */
+    --qc-tl-cap-w: 16rem;
+    /* A placeholder until the script measures the tallest caption into it */
+    --qc-tl-cap-h: 8rem;
+    /* The ticker's position, and the caption's - a beat behind it */
+    --qc-tl-pct: 0;
+    --qc-tl-cap-pct: 0;
+  }
+
+  /* --- The authored list -------------------------------------------------
+     What renders with JS off or reduced motion on, so it has to stand on its
+     own. Once the script takes over it stays in the accessibility tree - the
+     ruler on top of it is decoration and is marked aria-hidden - so it is
+     hidden by clipping rather than by display: none. */
+  .qc-article .qc-tl-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .qc-article .qc-tl-steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .qc-article .qc-tl-step {
+    margin: 0;
+    padding-left: 0.875rem;
+    border-left: 2px solid rgba(252, 107, 85, 0.45);
+  }
+
+  .qc-article .qc-tl-step::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--font-job-role);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(25, 34, 77, 0.45);
+  }
+
+  .qc-article .qc-tl-step-title {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: 1.125rem;
+    line-height: 1.25;
+    color: #19224D;
+  }
+
+  .qc-article .qc-tl-step-desc {
+    margin: 0.375rem 0 0;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: #6b7280;
+  }
+
+  /* The major/minor split survives into the fallback too, or the list reads as
+     seven equal events when it isn't one - but in the rule and the title's
+     weight, not in the size. Every entry is set at the same size here as well. */
+  .qc-article .qc-tl-step[data-kind='minor'] {
+    border-left-color: rgba(25, 34, 77, 0.18);
+  }
+
+  .qc-article .qc-tl-step[data-kind='minor'] .qc-tl-step-title {
+    color: rgba(25, 34, 77, 0.75);
+  }
+
+  .qc-article .qc-timeline[data-observed='true'] .qc-tl-steps {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* --- The ruler ---------------------------------------------------------
+     Built by the script, so it stays out of the way until the script has run */
+  .qc-article .qc-tl-stage {
+    display: none;
+  }
+
+  .qc-article .qc-timeline[data-observed='true'] .qc-tl-stage {
+    display: block;
+  }
+
+  /* The ruler - the year labels and the track together - is inset inside the
+     block, and the captions underneath it are not. That gap is what gives the
+     first and last milestones room: a caption is centred on its line, so a
+     milestone near an end of the ruler needs half a caption's width of block
+     beside it, and the ruler's ends are no longer the block's ends. It also
+     leaves the year at the far right somewhere to put its label. */
+  .qc-article .qc-tl-years,
+  .qc-article .qc-tl-track {
+    margin-left: var(--qc-tl-inset);
+    margin-right: var(--qc-tl-inset);
+  }
+
+  .qc-article .qc-tl-years {
+    position: relative;
+    height: 1.125rem;
+  }
+
+  /* Set from the label's left edge, not its centre, so it reads as annotating
+     the line that starts the year rather than floating over it */
+  .qc-article .qc-tl-year {
+    position: absolute;
+    bottom: 0;
+    margin-left: -1px;
+    font-family: var(--font-job-role);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: rgba(25, 34, 77, 0.4);
+    white-space: nowrap;
+  }
+
+  /* Clickable across its whole width, not only on the marks - a click in a gap
+     snaps to the nearest one, so hitting a milestone never needs precision */
+  .qc-article .qc-tl-track {
+    position: relative;
+    height: var(--qc-tl-head-h);
+    cursor: pointer;
+  }
+
+  .qc-article .qc-tl-layer {
+    position: absolute;
+    inset: 0;
+    /* Every layer sits over the full track, so they all have to let clicks
+       through to it. The marks put pointer events back on themselves only. */
+    pointer-events: none;
+  }
+
+  .qc-article .qc-tl-tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: var(--qc-tl-week-h);
+    background: var(--qc-tl-tick);
+  }
+
+  /* Every fourth line, so a month reads as a unit without being labelled */
+  .qc-article .qc-tl-tick--month {
+    height: var(--qc-tl-month-h);
+    background: var(--qc-tl-month);
+  }
+
+  /* --- Months with something in them -------------------------------------
+     The same month line as any other, in coral and a little longer, and a
+     button: clicking one jumps the ticker to that step. The button is a wide
+     transparent hit area and the visible line is drawn as ::after, so the
+     target is a comfortable 20px even though it reads as a 2px line. Sizing
+     the button down to the line itself would make it unhittable. */
+  .qc-article .qc-tl-mark {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    margin-left: -10px;
+    padding: 0;
+    border: 0;
+    background: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .qc-article .qc-tl-mark::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    margin-left: -1px;
+    height: var(--qc-tl-mark-h);
+    background: var(--qc-tl-head);
+    transition: height 460ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* A minor beat is the same coral line drawn thinner and paler - the month
+     still has something in it, and the ruler shouldn't say otherwise */
+  .qc-article .qc-tl-mark--minor::after {
+    width: 1px;
+    height: var(--qc-tl-month-h);
+    background: rgba(252, 107, 85, 0.55);
+  }
+
+  /* Selected: the line runs down to its caption, so the two are one shape
+     rather than a mark with a label somewhere below it. Both kinds extend the
+     whole way - a minor stopping short would leave its caption floating - so
+     the hierarchy stays in the width and in the caption. */
+  .qc-article .qc-tl-mark.is-active::after {
+    height: var(--qc-tl-head-h);
+  }
+
+  .qc-article .qc-tl-mark--minor.is-active::after {
+    background: var(--qc-tl-head);
+  }
+
+  /* Hovering reaches part of the way, previewing where a click would take it */
+  .qc-article .qc-tl-mark:hover::after {
+    height: calc(var(--qc-tl-mark-h) + 10px);
+    background: var(--qc-tl-head);
+  }
+
+  .qc-article .qc-tl-mark.is-active:hover::after {
+    height: var(--qc-tl-head-h);
+  }
+
+  .qc-article .qc-tl-mark:focus-visible {
+    outline: 2px solid var(--qc-tl-head);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .qc-article .qc-tl-head {
+    position: absolute;
+    top: 0;
+    left: calc(var(--qc-tl-pct) * 1%);
+    width: 2px;
+    height: var(--qc-tl-head-h);
+    margin-left: -1px;
+    border-radius: 1px;
+    background: var(--qc-tl-head);
+    transition: left 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease;
+    /* It parks on top of the active mark, and must not swallow its clicks */
+    pointer-events: none;
+  }
+
+  /* --- The caption -------------------------------------------------------
+     Centred on the ticker's line, always. The height is reserved up front by
+     the script so stepping between captions of different lengths can't shunt
+     the rest of the page up and down. */
+  .qc-article .qc-tl-caption {
+    position: relative;
+    height: var(--qc-tl-cap-h);
+    margin-top: 1.25rem;
+  }
+
+  /* --qc-tl-cap-x is the selected line's distance from the left of this box.
+     The script writes positions as percentages of the ruler, and the ruler is
+     inset inside the block the captions span, so the inset has to be added
+     back on and the percentage taken of what is left. left puts the box's
+     origin there and translateX takes back half of its own width, so whatever
+     that width turns out to be, its centre is the line.
+
+     The width is the widest box that is both centred on that line and inside
+     the block: twice the distance to whichever end is nearer, or the preferred
+     width when there is room for it. A box centred 10% along can only be 20%
+     wide, so something has to give near the ends, and it is the width - it
+     used to be the centring, the caption clamping itself inside the block,
+     which read as the first entry being misaligned. The inset above is sized
+     so that on a full-width column nothing has to give at all; the min() is
+     what holds this together on a narrow screen, where the caption wraps to
+     more lines rather than drifting off its line. */
+  .qc-article .qc-tl-cap-inner {
+    --qc-tl-cap-x: calc(
+      var(--qc-tl-inset) +
+      var(--qc-tl-cap-pct) * (100% - 2 * var(--qc-tl-inset)) / 100
+    );
+    position: absolute;
+    top: 0;
+    left: var(--qc-tl-cap-x);
+    transform: translateX(-50%);
+    width: min(
+      var(--qc-tl-cap-w),
+      calc(2 * var(--qc-tl-cap-x)),
+      calc(200% - 2 * var(--qc-tl-cap-x))
+    );
+    text-align: center;
+    /* Opacity alone. One caption crosses into the next and nothing else moves -
+       the ticker is already travelling, and a caption sliding in under it gives
+       the eye a second thing to follow. The duration has to match FADE in the
+       script, which times the swap around it. */
+    transition: opacity 300ms ease;
+  }
+
+  .qc-article .qc-tl-cap-inner[data-swap='true'] {
+    opacity: 0;
+  }
+
+  .qc-article .qc-tl-cap-title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: 1.125rem;
+    line-height: 1.25;
+    color: #19224D;
+  }
+
+  .qc-article .qc-tl-cap-desc {
+    margin: 0.5rem 0 0;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: #6b7280;
+  }
+
+  /* Every caption is set the same: one size for the titles and one for the
+     bodies, in the same column width, whether the step is a major or a minor.
+     A minor beat is marked by its line on the ruler and by how long it holds -
+     resizing its text as well made the captions look like two components.
+     All that is left of the kind here is a slightly softer title. */
+  .qc-article .qc-tl-cap-inner[data-kind='minor'] .qc-tl-cap-title {
+    color: rgba(25, 34, 77, 0.78);
+  }
+
+  /* Nineteen months of week lines is comfortable across the article column on a
+     laptop and far too dense on a phone, so the ruler is thinned to a fortnight
+     and then to a month as the screen narrows. The lines to drop are marked in
+     the script rather than counted with nth-child: the months that hold a
+     milestone are drawn separately, so the count has gaps in it and nth-child
+     would start hiding month lines instead. */
+  @media (max-width: 640px) {
+    .qc-article .qc-tl-tick--fine {
+      display: none;
+    }
+
+    .qc-article .qc-timeline {
+      --qc-tl-head-h: 68px;
+      --qc-tl-mark-h: 26px;
+      /* Nothing to spare: the ruler takes the whole block */
+      --qc-tl-inset: 0px;
+    }
+
+    /* And with the block this narrow there is no column to be centred on a
+       line either - a caption beside the first milestone could only be about
+       a fifth of the screen wide, which is a word per line. So the caption
+       takes the full width and is centred in the block, and the ticker on the
+       ruler above it is what says which milestone is up. */
+    .qc-article .qc-tl-cap-inner {
+      left: 0;
+      width: 100%;
+      transform: none;
+    }
+  }
+
+  /* Only the month lines left, which is still a reading of the same ruler */
+  @media (max-width: 420px) {
+    .qc-article .qc-tl-tick:not(.qc-tl-tick--month) {
+      display: none;
+    }
+  }
+
+  /* Center all images including HTML img tags */
+  .qc-article img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Some content sets inline max-widths wider than the column - clamp them
+     so they can't overflow (and get clipped by overflow-x-hidden) */
+  .qc-article [style*="max-width"] {
+    max-width: 100% !important;
+  }
+
+  /* Offset anchor targets for the sticky top bar */
+  .qc-article :target {
+    scroll-margin-top: 6rem;
+  }
+</style>
+
+<script is:inline>
+  // Update back link based on query parameter
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get('from');
+    const backLink = document.getElementById('back-link');
+    const backLabel = document.getElementById('back-label');
+
+    if (from === 'projects' && backLink && backLabel) {
+      backLink.href = '/projects';
+      backLabel.textContent = 'Projects';
+    } else if (from === 'work' && backLink && backLabel) {
+      backLink.href = '/#work';
+      backLabel.textContent = 'Case Studies';
+    }
+  })();
+
+  // Reveal the framing questions when they scroll into view
+  (function() {
+    const section = document.getElementById('qc-questions');
+    if (!section) return;
+
+    // Marks that JS is running, which arms the hidden initial state. The CSS
+    // keeps the words visible until this is set, so a failed script leaves
+    // readable text instead of an empty gap.
+    section.setAttribute('data-observed', 'true');
+
+    function reveal() {
+      section.setAttribute('data-revealed', 'true');
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      reveal();
+      return;
+    }
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          reveal();
+          observer.disconnect(); // Runs once - no replay on scroll back up
+        }
+      });
+    }, { threshold: 0.25 });
+
+    observer.observe(section);
+  })();
+
+  // --- Impact timeline ----------------------------------------------------
+  // Builds the ruler out of the authored step list in the case study, then
+  // walks a ticker through the milestones for as long as the block is on
+  // screen. Nothing about the milestones lives here: the list is the only
+  // source of truth, and this reads it.
+  (function () {
+    var roots = document.querySelectorAll('[data-qc-timeline]');
+    if (!roots.length) return;
+
+    // Reduced motion keeps the authored list as-is. A caption that replaces
+    // itself every few seconds, unasked, is precisely what that setting is
+    // asking us not to do, and there is no still version of this that shows
+    // more than one milestone at a time.
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Reading time at each milestone - the same at every one, so the cycle has
+    // a steady beat you can settle into rather than one that hurries through
+    // some entries. What makes a minor beat minor is its line on the ruler and
+    // its softer title, not being taken off the screen sooner.
+    var DWELL = 3000;
+    var TRAVEL = 900; // must match the ticker's `left` transition in the CSS
+    var FADE = 300;   // must match the caption's opacity transition
+    // The ruler's one unit of measure. Every month is four week lines wide
+    // whatever its real length: see the note on the CSS block for why.
+    var WEEKS_PER_MONTH = 4;
+    var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    Array.prototype.forEach.call(roots, build);
+
+    function build(root) {
+      var list = root.querySelector('.qc-tl-steps');
+      if (!list) return;
+
+      var first = monthOf(root.getAttribute('data-start'));
+      var last = monthOf(root.getAttribute('data-end'));
+      if (first === null || last === null || last <= first) return;
+
+      // Both ends are inclusive, and the closing month is drawn whole - so the
+      // ruler runs out in week lines rather than stopping dead on a month line
+      var lines = (last - first + 1) * WEEKS_PER_MONTH;
+
+      var steps = [];
+      Array.prototype.forEach.call(list.querySelectorAll('.qc-tl-step'), function (item) {
+        var month = monthOf(item.getAttribute('data-date'));
+        // Anything outside the ruler's span is dropped rather than clamped to
+        // an end, which would put a milestone at a date it didn't happen
+        if (month === null || month < first || month > last) return;
+        // A step lands on a line of the ruler, never between two: the month
+        // gives the month line and the day picks one of that month's four week
+        // lines off it. A first-of-the-month date is the month line itself,
+        // which is where most steps sit - the day is there for the ones that
+        // need to be told apart inside one month.
+        var line = (month - first) * WEEKS_PER_MONTH + weekOf(item.getAttribute('data-date'));
+        steps.push({
+          line: line,
+          pct: pctAt(line),
+          kind: item.getAttribute('data-kind') === 'minor' ? 'minor' : 'major',
+          date: item.getAttribute('data-label') || monthLabel(month),
+          title: textOf(item, '.qc-tl-step-title'),
+          desc: textOf(item, '.qc-tl-step-desc')
+        });
+      });
+      // With fewer than two there is nothing to walk through, so the list stays
+      if (steps.length < 2) return;
+
+      var stage = el('div', 'qc-tl-stage');
+
+      // The authored list stays in the accessibility tree, and the ruler is a
+      // second rendering of the same content - so everything decorative here is
+      // hidden from it one layer at a time. Not the stage as a whole: the marks
+      // are focusable buttons, and a focusable control inside an aria-hidden
+      // subtree is the one thing that arrangement must not produce.
+      // Only the Januaries inside the ruler are labelled. A part-year at either
+      // end has no January to sit on, and pinning its label to the edge would
+      // name a point the ruler doesn't start at - so it goes unlabelled, which
+      // is why a July-2025-to-January-2027 span carries a 2026 and a 2027 but
+      // no 2025. The label sits at the start of its year, and the ruler is
+      // inset inside the block, so a January near the far end has somewhere to
+      // put its label.
+      var years = hidden(el('div', 'qc-tl-years'));
+      for (var month = first; month <= last; month += 1) {
+        if (month % 12 !== 0) continue;
+        var label = el('span', 'qc-tl-year');
+        label.textContent = String(Math.floor(month / 12));
+        label.style.left = pctAt((month - first) * WEEKS_PER_MONTH) + '%';
+        years.appendChild(label);
+      }
+
+      // The lines a milestone sits on, so the ruler can leave those out: a grey
+      // month line drawn under a coral one would only show through it
+      var taken = {};
+      steps.forEach(function (step) { taken[step.line] = true; });
+
+      var weeks = hidden(el('div', 'qc-tl-layer qc-tl-weeks'));
+      for (var i = 0; i < lines; i += 1) {
+        if (taken[i]) continue;
+        var week = el('span', 'qc-tl-tick'
+          + (i % WEEKS_PER_MONTH === 0 ? ' qc-tl-tick--month' : '')
+          // Marked here rather than counted in CSS, since the loop skips lines
+          + (i % 2 === 1 ? ' qc-tl-tick--fine' : ''));
+        week.style.left = pctAt(i) + '%';
+        weeks.appendChild(week);
+      }
+
+      // The months with something in them get a layer of their own, kept out of
+      // the hidden ones: they are the timeline's controls, so they are the part
+      // that stays reachable
+      var markLayer = el('div', 'qc-tl-layer qc-tl-marks');
+      var marks = steps.map(function (step, at) {
+        var mark = el('button', 'qc-tl-mark' + (step.kind === 'minor' ? ' qc-tl-mark--minor' : ''));
+        mark.setAttribute('type', 'button');
+        // The date and title, because the line on its own is unlabelled - and
+        // the ruler around it isn't readable to take any context from
+        mark.setAttribute('aria-label', step.date + ': ' + step.title);
+        mark.addEventListener('click', function () { pick(at); });
+        mark.style.left = step.pct + '%';
+        markLayer.appendChild(mark);
+        return mark;
+      });
+
+      var head = hidden(el('div', 'qc-tl-head'));
+      var track = el('div', 'qc-tl-track');
+      track.appendChild(weeks);
+      track.appendChild(markLayer);
+      track.appendChild(head);
+      // A click anywhere on the ruler goes to the nearest milestone, so the
+      // gaps between marks aren't dead space the reader has to aim around
+      track.addEventListener('click', function (event) {
+        if (event.target !== track) return; // a mark handled it already
+        pick(nearest(event));
+      });
+
+      // No date in the caption: the ruler is already saying when, and the month
+      // line the caption hangs off is the answer. The step's date is still read
+      // from the list - it labels the mark for a screen reader, and it is what
+      // the fallback list prints - it just isn't repeated here.
+      var capTitle = el('h4', 'qc-tl-cap-title');
+      var capDesc = el('p', 'qc-tl-cap-desc');
+      var inner = el('div', 'qc-tl-cap-inner');
+      inner.appendChild(capTitle);
+      inner.appendChild(capDesc);
+      var caption = hidden(el('div', 'qc-tl-caption'));
+      caption.appendChild(inner);
+
+      stage.appendChild(years);
+      stage.appendChild(track);
+      stage.appendChild(caption);
+      root.insertBefore(stage, list);
+
+      // Arms the CSS: shows the ruler, clips the authored list
+      root.setAttribute('data-observed', 'true');
+
+      var index = 0;
+      // Which milestone the caption is currently showing. Not the same as index
+      // during a move: the ticker leaves first and the caption follows, and
+      // measure() has to put back what was on screen rather than what is being
+      // travelled to.
+      var shown = 0;
+      var running = false;
+      var onScreen = false;
+      var held = false;
+      var cycleTimer = null;
+      // The second half of a swap, while it is in flight: held as a function so
+      // it can be finished early on a pause, or dropped if the reader overtakes
+      var swapTimer = null;
+      var pending = null;
+
+      // The ticker starts at 0% in the CSS, so this first placement has to
+      // suppress the transition or it would slide in from the left edge on load
+      withoutTransition(function () {
+        place(0);
+        placeCaption(0);
+      });
+      light(0);
+      fill(steps[0]);
+      measure();
+
+      // A caption's width follows the column's, and its height follows its
+      // width, so what the block has to reserve changes with the window
+      var remeasure = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(remeasure);
+        remeasure = setTimeout(measure, 150);
+      });
+
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          onScreen = entries[entries.length - 1].isIntersecting;
+          sync();
+        }, { threshold: 0.35 });
+        observer.observe(root);
+      } else {
+        onScreen = true;
+        sync();
+      }
+
+      // Pausing on hover and on focus is what makes an unprompted auto-advance
+      // reasonable: a reader who wants to stay on one milestone can
+      root.addEventListener('pointerenter', function () { held = true; sync(); });
+      root.addEventListener('pointerleave', function () { held = false; sync(); });
+      root.addEventListener('focusin', function () { held = true; sync(); });
+      root.addEventListener('focusout', function () { held = false; sync(); });
+
+      function sync() {
+        if (onScreen && !held) run();
+        else halt();
+      }
+
+      function run() {
+        if (running) return;
+        running = true;
+        cycleTimer = setTimeout(onCycle, DWELL);
+      }
+
+      function halt() {
+        if (!running) return;
+        running = false;
+        clearTimeout(cycleTimer);
+        cycleTimer = null;
+        // Stopping part-way through a swap would leave the caption faded out
+        // mid-cross-fade, so it is finished off here. With nothing in flight
+        // there is nothing to finish, and settle() leaves it alone.
+        settle();
+      }
+
+      function onCycle() {
+        var next = (index + 1) % steps.length;
+        if (next === 0) restart();
+        else step(next);
+        cycleTimer = setTimeout(onCycle, DWELL);
+      }
+
+      // Forward one milestone: the caption fades out where it stands while the
+      // ticker sets off, then it moves and fades back in as the ticker lands.
+      // The delay is set so the fade-in finishes on arrival, not before it.
+      function step(i) {
+        inner.setAttribute('data-swap', 'true');
+        place(i);
+        swap(function () {
+          light(i);
+          placeCaption(i);
+          fill(steps[i]);
+          inner.setAttribute('data-swap', 'false');
+        }, TRAVEL - FADE);
+      }
+
+      // A mark clicked, or activated from the keyboard. The reader has taken
+      // over, so the cycle's own next move is abandoned and the wait is
+      // restarted from here - carrying on from the old schedule would move the
+      // ticker off the step they just asked for, sometimes immediately.
+      function pick(i) {
+        drop();
+        head.style.opacity = '';
+        if (i === index) {
+          // Already here, but possibly faded out half way through a cross-fade
+          // the click has just abandoned - so it is brought back in place
+          light(i);
+          placeCaption(i);
+          fill(steps[i]);
+          inner.setAttribute('data-swap', 'false');
+        } else {
+          step(i);
+        }
+        if (!running) return;
+        clearTimeout(cycleTimer);
+        cycleTimer = setTimeout(onCycle, DWELL);
+      }
+
+      // Which milestone a click on the bare track meant: the nearest one along
+      // the ruler, measured in the same percentages everything else is placed in
+      function nearest(event) {
+        var box = track.getBoundingClientRect();
+        if (!box.width) return index;
+        var at = ((event.clientX - box.left) / box.width) * 100;
+        var closest = 0;
+        steps.forEach(function (step, i) {
+          if (Math.abs(step.pct - at) < Math.abs(steps[closest].pct - at)) closest = i;
+        });
+        return closest;
+      }
+
+      function swap(finish, delay) {
+        pending = finish;
+        swapTimer = setTimeout(function () {
+          swapTimer = null;
+          pending = null;
+          finish();
+        }, delay);
+      }
+
+      // Runs a swap's second half now rather than on its timer
+      function settle() {
+        if (swapTimer === null) return;
+        var finish = pending;
+        drop();
+        finish();
+      }
+
+      function drop() {
+        clearTimeout(swapTimer);
+        swapTimer = null;
+        pending = null;
+      }
+
+      // Back to the beginning. The ticker doesn't sweep all the way back across
+      // the ruler - it goes out where it is and returns at the start, which
+      // reads as a fresh pass rather than a rewind.
+      function restart() {
+        inner.setAttribute('data-swap', 'true');
+        head.style.opacity = '0';
+        swap(function () {
+          withoutTransition(function () {
+            place(0);
+            placeCaption(0);
+          });
+          head.style.opacity = '';
+          light(0);
+          fill(steps[0]);
+          inner.setAttribute('data-swap', 'false');
+        }, FADE);
+      }
+
+      // Positions are line indices as a share of the ruler's width, so the first
+      // line sits on the left edge and the last one on the right
+      function pctAt(line) {
+        return (line / (lines - 1)) * 100;
+      }
+
+      // Sends the ticker off and collapses the line it is leaving. Extending the
+      // new one is light()'s job, which the callers fire as the ticker lands: the
+      // line growing has to look like the ticker arriving, and a line that shot
+      // up before it got there would read as the ruler answering ahead of it.
+      function place(i) {
+        index = i;
+        root.style.setProperty('--qc-tl-pct', String(steps[i].pct));
+        marks.forEach(function (mark) {
+          mark.classList.toggle('is-active', false);
+          mark.removeAttribute('aria-current');
+        });
+      }
+
+      function light(i) {
+        marks[i].classList.toggle('is-active', true);
+        marks[i].setAttribute('aria-current', 'true');
+      }
+
+      function placeCaption(i) {
+        shown = i;
+        root.style.setProperty('--qc-tl-cap-pct', String(steps[i].pct));
+      }
+
+      // Reserve the tallest caption, so that stepping between milestones of
+      // different lengths doesn't shunt the rest of the page up and down every
+      // few seconds. Each one is measured where it will really sit, because a
+      // caption near an end of the ruler is narrower and so wraps to more lines
+      // - see the width in the CSS. The walk isn't animated and isn't painted:
+      // it all happens inside one frame, and it ends back where it started.
+      function measure() {
+        var was = shown;
+        var tallest = 0;
+        steps.forEach(function (step, i) {
+          placeCaption(i);
+          fill(step);
+          tallest = Math.max(tallest, inner.offsetHeight);
+        });
+        placeCaption(was);
+        fill(steps[was]);
+        root.style.setProperty('--qc-tl-cap-h', tallest + 'px');
+      }
+
+      // Only the text. The caption crosses from one step to the next on opacity
+      // alone, which the CSS does - so this runs while it is invisible and has
+      // nothing to animate itself.
+      function fill(step) {
+        // Every caption is set at the same size; the kind only softens a minor
+        // beat's title, the rest of that distinction being on the ruler
+        inner.setAttribute('data-kind', step.kind);
+        capTitle.textContent = step.title;
+        capDesc.textContent = step.desc;
+      }
+
+      // Reading offsetWidth in the middle flushes the new position, so putting
+      // the transitions back can't animate the jump we just made
+      function withoutTransition(change) {
+        head.style.transition = 'none';
+        inner.style.transition = 'none';
+        change();
+        void root.offsetWidth;
+        head.style.transition = '';
+        inner.style.transition = '';
+      }
+    }
+
+    function el(tag, className) {
+      var node = document.createElement(tag);
+      node.className = className;
+      return node;
+    }
+
+    // Everything that is a second rendering of the authored list, rather than a
+    // control, is kept out of the accessibility tree one node at a time
+    function hidden(node) {
+      node.setAttribute('aria-hidden', 'true');
+      return node;
+    }
+
+    function textOf(scope, selector) {
+      var found = scope.querySelector(selector);
+      return found ? found.textContent.trim() : '';
+    }
+
+    // A date, as a count of months. Read straight off the string rather than
+    // through Date, which would drag a timezone into an arithmetic that has no
+    // time in it - and used to cost the ruler a day's drift west of Greenwich.
+    function monthOf(text) {
+      var parts = /^(\d{4})-(\d{2})/.exec(text || '');
+      if (!parts) return null;
+      return Number(parts[1]) * 12 + (Number(parts[2]) - 1);
+    }
+
+    // Which of a month's four week lines a date falls on. A month is four lines
+    // wide however long it really is, so the last few days of a long month
+    // share the fourth line rather than spilling into the next month's first.
+    // No day, or the first of the month, is the month line itself.
+    function weekOf(text) {
+      var parts = /^\d{4}-\d{2}-(\d{2})/.exec(text || '');
+      if (!parts) return 0;
+      var week = Math.floor((Number(parts[1]) - 1) / 7);
+      return Math.min(WEEKS_PER_MONTH - 1, Math.max(0, week));
+    }
+
+    function monthLabel(month) {
+      return MONTHS[month % 12] + ' ' + Math.floor(month / 12);
+    }
+  })();
+
+  // Mobile menu toggle
+  (function() {
+    const menuToggle = document.getElementById('project-menu-toggle');
+    const menuClose = document.getElementById('project-menu-close');
+    const mobileMenu = document.getElementById('project-mobile-menu');
+    const hamburgerIcon = document.getElementById('project-hamburger-icon');
+    const closeIcon = document.getElementById('project-close-icon');
+
+    function openMenu() {
+      mobileMenu?.classList.remove('hidden');
+      mobileMenu?.classList.add('flex');
+      mobileMenu?.offsetHeight; // Trigger reflow
+      mobileMenu?.classList.remove('translate-x-full');
+      mobileMenu?.classList.add('translate-x-0');
+      hamburgerIcon?.classList.add('hidden');
+      closeIcon?.classList.remove('hidden');
+      menuToggle?.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      mobileMenu?.classList.remove('translate-x-0');
+      mobileMenu?.classList.add('translate-x-full');
+      hamburgerIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+      menuToggle?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      setTimeout(function() {
+        mobileMenu?.classList.add('hidden');
+        mobileMenu?.classList.remove('flex');
+      }, 300);
+    }
+
+    menuToggle?.addEventListener('click', openMenu);
+    menuClose?.addEventListener('click', closeMenu);
+
+    // Close menu when clicking a link
+    mobileMenu?.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', closeMenu);
+    });
+  })();
+</script>

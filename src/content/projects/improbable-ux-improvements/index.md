@@ -8,6 +8,8 @@ parent: improbable
 workplace: Improbable Worlds Ltd. 
 showOnHomepage: false
 tags: ["research", "UX"]
+role: "UX Engineer"
+year: "2020"
 ---
 
 ## The Project

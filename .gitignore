@@ -16,6 +16,9 @@ dist-ssr
 node_modules
 *.local
 
+# Astro's generated cache and types - rebuilt by astro dev/sync/build
+.astro/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

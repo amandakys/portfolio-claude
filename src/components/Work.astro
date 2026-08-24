@@ -1,25 +1,74 @@
 ---
 import ExperienceCard from './ExperienceCard.astro';
 import WorkBackground from './WorkBackground.jsx';
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 
 import kedroBackground from '../assets/backgrounds/kedro-background.png';
 import mavenBackground from '../assets/backgrounds/maven-background.png';
 import improbableBackground from '../assets/backgrounds/improbable-background.png';
-import kedroLogo from '../assets/logos/kedro-logo.png';
 import mavenLogo from '../assets/logos/maven-logo.png';
 import improbableLogo from '../assets/logos/improbable-logo.png';
 import quantumblackLogo from '../assets/logos/quantumblack-logo.png';
 import quantcoLogo from '../assets/logos/quantco-logo.png';
 import quantcoBackground from '../assets/backgrounds/quantco-background.png';
 
-// Fetch project descriptions
+// Titles and descriptions come from each project's frontmatter
 const projects = await getCollection('projects');
-const quantcoProject = projects.find(p => p.slug === 'quantco');
-const quantumblackProject = projects.find(p => p.slug === 'quantumblack');
-const mavenProject = projects.find(p => p.slug === 'maven');
-const improbableProject = projects.find(p => p.slug === 'improbable');
+const dataFor = (slug: string) => projects.find(p => p.slug === slug)?.data;
+// Prefer `pageTitle` - the short project name - over the long descriptive
+// `title` the listing cards use, which wraps to several lines at this size
+const titleFor = (slug: string) => {
+  const data = dataFor(slug);
+  return data?.pageTitle || data?.title || '';
+};
+const descriptionFor = (slug: string) => dataFor(slug)?.description || '';
+
+// Newest role first - the carousel starts on the current job
+const roles = [
+  {
+    slug: 'quantco',
+    backgroundImage: quantcoBackground,
+    logoImage: quantcoLogo,
+    logoImageAlt: 'QuantCo',
+    jobRole: 'Founding Designer',
+    companyName: 'QuantCo',
+    alt: 'QuantCo Case Studio platform interface',
+    href: '/work/quantco?from=work',
+  },
+  {
+    slug: 'quantumblack',
+    backgroundImage: kedroBackground,
+    logoImage: quantumblackLogo,
+    logoImageAlt: 'QuantumBlack',
+    jobRole: 'Technical Product Designer',
+    companyName: 'QuantumBlack',
+    alt: 'Kedro framework interface background',
+    href: '/work/quantumblack?from=work',
+  },
+  {
+    slug: 'maven',
+    backgroundImage: mavenBackground,
+    logoImage: mavenLogo,
+    logoImageAlt: 'Maven',
+    jobRole: 'Lead Designer',
+    companyName: 'Maven',
+    alt: 'Maven trading interface background',
+    href: '/work/maven?from=work',
+  },
+  {
+    slug: 'improbable',
+    backgroundImage: improbableBackground,
+    logoImage: improbableLogo,
+    logoImageAlt: 'Improbable',
+    jobRole: 'UX Engineer',
+    companyName: 'Improbable',
+    alt: 'Improbable abstract geometric background',
+    href: '/work/improbable?from=work',
+  },
+];
+
+// How long each slide is held before advancing, in ms
+const AUTOPLAY_DELAY = 6000;
 ---
 
 <section id="work" class="relative py-12 sm:py-16 lg:py-20 2xl:py-12 z-10">
@@ -27,12 +76,11 @@ const improbableProject = projects.find(p => p.slug === 'improbable');
   {/* Container */}
   <div class="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl z-10">
 
-    {/* Middle Section: Work Title, Company Logos, and Current Work Indicator */}
+    {/* Section Title */}
     <div class="mb-2 sm:mb-3">
-      {/* Work Title */}
       <div class="text-center">
         <h2 class="font-ebrula text-6xl sm:text-7xl lg:text-8xl xl:text-9xl text-[#FC6B55] leading-tight">
-          Work
+          Case Studies
         </h2>
         <div class="mt-2 sm:mt-3">
           <a
@@ -45,10 +93,13 @@ const improbableProject = projects.find(p => p.slug === 'improbable');
       </div>
     </div>
 
-    {/* Bottom Section: Work Experience Cards */}
-    <div class="relative">
-      {/* "I work here" indicator positioned above the first card */}
-      <div class="flex items-center justify-center md:justify-start md:pl-12 mb-1 max-w-3xl mx-auto">
+    {/* Work Experience Carousel */}
+    <div class="relative max-w-4xl mx-auto">
+      {/* "i work here now" indicator - only applies while the current role is showing */}
+      <div
+        id="work-current-indicator"
+        class="flex items-center justify-center md:justify-start md:pl-12 mb-1 transition-opacity duration-500"
+      >
         <p class="font-square-peg text-[#FC6B55] text-[28px] sm:text-[40px]">
           i work here now
         </p>
@@ -66,55 +117,349 @@ const improbableProject = projects.find(p => p.slug === 'improbable');
           <path d="M18 28 L20 31 L22 28" />
         </svg>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto">
-      {/* QuantCo - Founding Designer */}
-      <ExperienceCard
-        backgroundImage={quantcoBackground}
-        logoImage={quantcoLogo}
-        logoImageAlt="QuantCo"
-        jobRole="Founding Designer"
-        companyName="QuantCo"
-        description={quantcoProject?.data.title || ""}
-        alt="QuantCo Case Studio platform interface"
-        href="/work/quantco?from=work"
-      />
 
-      {/* QuantumBlack - Technical UX Designer */}
-      <ExperienceCard
-        backgroundImage={kedroBackground}
-        logoImage={quantumblackLogo}
-        logoImageAlt="QuantumBlack"
-        jobRole="Technical Product Designer"
-        companyName="QuantumBlack"
-        description={quantumblackProject?.data.title || ""}
-        alt="Kedro framework interface background"
-        href="/work/quantumblack?from=work"
-      />
+      <div
+        id="work-carousel"
+        class="relative"
+        data-autoplay-delay={AUTOPLAY_DELAY}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Work experience"
+        tabindex="0"
+      >
+        {/* Track - slides are stacked so the last can wrap to the first without
+             rewinding through the ones in between. The first slide is in normal
+             flow to give the track its height; the rest are overlaid on top. */}
+        <div id="work-track" class="relative overflow-hidden">
+          {roles.map((role, i) => (
+            <div
+              class:list={[
+                'work-slide w-full',
+                i === 0 ? 'relative' : 'absolute inset-0'
+              ]}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${i + 1} of ${roles.length}: ${role.companyName}`}
+              data-index={i}
+              data-revealing={i === 0 ? '' : undefined}
+              aria-hidden={i === 0 ? 'false' : 'true'}
+            >
+              <ExperienceCard
+                layout="wide"
+                backgroundImage={role.backgroundImage}
+                logoImage={role.logoImage}
+                logoImageAlt={role.logoImageAlt}
+                projectTitle={titleFor(role.slug)}
+                jobRole={role.jobRole}
+                companyName={role.companyName}
+                description={descriptionFor(role.slug)}
+                alt={role.alt}
+                href={role.href}
+              />
+            </div>
+          ))}
+        </div>
 
-      {/* Maven - Lead Designer */}
-      <ExperienceCard
-        backgroundImage={mavenBackground}
-        logoImage={mavenLogo}
-        logoImageAlt="Maven"
-        jobRole="Lead Designer"
-        companyName="Maven"
-        description={mavenProject?.data.title || ""}
-        alt="Maven trading interface background"
-        href="/work/maven?from=work"
-      />
-
-      {/* Improbable - UX Engineer */}
-      <ExperienceCard
-        backgroundImage={improbableBackground}
-        logoImage={improbableLogo}
-        logoImageAlt="Improbable"
-        jobRole="UX Engineer"
-        companyName="Improbable"
-        description={improbableProject?.data.title || ""}
-        alt="Improbable abstract geometric background"
-        href="/work/improbable?from=work"
-      />
       </div>
+
+      {/* Progress bars double as navigation - click one to jump to that slide.
+           The active bar fills as the autoplay timer counts down. */}
+      <div class="flex items-stretch justify-center gap-2 sm:gap-3 mt-6">
+        {roles.map((role, i) => (
+          <button
+            type="button"
+            class="work-bar group/bar flex-1 max-w-[110px] py-3 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FC6B55] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            aria-label={`Show ${role.companyName}`}
+            aria-current={i === 0 ? 'true' : 'false'}
+          >
+            <span class="block h-1 w-full overflow-hidden bg-white/25 group-hover/bar:bg-white/50 transition-colors duration-300">
+              <span class="work-bar-fill block h-full w-full origin-left bg-[#FC6B55]" style="transform: scaleX(0)"></span>
+            </span>
+          </button>
+        ))}
+      </div>
+
     </div>
   </div>
 </section>
+
+<style>
+  /* Push transition - the incoming card shoves the outgoing one along. Slides
+     are stacked, so the last can wrap to the first without rewinding through
+     the ones in between. `data-from` is the side an inactive slide waits on
+     (which keeps wrap-around reading as forward motion) and `data-exit` marks
+     the one card that is actively leaving.
+
+     No fade on either card: both stay fully opaque so the pair reads as one
+     strip being pushed.
+
+     The easing winds up briefly, accelerates through the middle, then spends a
+     long tail decelerating into rest - a shove that has to overcome the card's
+     weight before friction bleeds it off. A pure ease-out is the wrong shape
+     here: it puts ~75% of the travel in the first fifth of the duration, which
+     reads as a snap with a dead pause after it rather than as movement. Both
+     cards share this one rule so they stay locked together while travelling.
+
+     Both variables are read by ExperienceCard.astro's content reveal, which
+     works across the component boundary because custom properties inherit.
+     --card-travel must match the transform duration above: the logo's fade is
+     derived from it so it completes exactly as the card lands. --reveal-delay is
+     when the text lines start, after most of the travel is done. */
+  .work-slide {
+    transition: transform 800ms cubic-bezier(0.5, 0.05, 0.25, 1);
+    --card-travel: 800ms;
+    --reveal-delay: 420ms;
+  }
+
+  .work-slide[aria-hidden='true'] {
+    pointer-events: none;
+  }
+
+  .work-slide[aria-hidden='false'] {
+    transform: none;
+    z-index: 1;
+  }
+
+  .work-slide[data-exit='left'] {
+    transform: translateX(-100%);
+  }
+
+  .work-slide[data-exit='right'] {
+    transform: translateX(100%);
+  }
+
+  /* Cards further back in the queue just wait offscreen. They jump into place
+     with no transition so they never streak past on their way round. */
+  .work-slide[aria-hidden='true']:not([data-exit]) {
+    transition: none;
+  }
+
+  .work-slide[aria-hidden='true']:not([data-exit])[data-from='left'] {
+    transform: translateX(-100%);
+  }
+
+  .work-slide[aria-hidden='true']:not([data-exit])[data-from='right'] {
+    transform: translateX(100%);
+  }
+
+  /* The active bar fills over the autoplay delay as a countdown to the next slide.
+     JS sets --fill-duration; bars for other slides snap back to empty. */
+  .work-bar-fill {
+    transition: transform 250ms ease;
+  }
+
+  .work-bar[aria-current='true'] .work-bar-fill {
+    transform: scaleX(1);
+    transition: transform var(--fill-duration, 6000ms) linear;
+  }
+
+  /* Paused (hover/focus/offscreen) freezes the fill where it is */
+  .work-bar[aria-current='true'][data-paused='true'] .work-bar-fill {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* The push degrades to a plain fade - no travel */
+    .work-slide {
+      transition: opacity 200ms ease;
+    }
+
+    .work-slide[aria-hidden='true'] {
+      transform: none;
+      opacity: 0;
+    }
+
+    .work-slide[aria-hidden='false'] {
+      opacity: 1;
+    }
+
+    /* Content reveal is disabled in ExperienceCard.astro's own media query */
+
+    /* No autoplay, so the bar just marks the active slide */
+    .work-bar[aria-current='true'] .work-bar-fill {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const carousel = document.getElementById('work-carousel');
+  const track = document.getElementById('work-track');
+  const indicator = document.getElementById('work-current-indicator');
+  const slides = Array.from(document.querySelectorAll('.work-slide'));
+  const bars = Array.from(document.querySelectorAll('.work-bar'));
+  const slideCount = slides.length;
+
+  if (carousel && track && slideCount > 0) {
+    const delay = Number(carousel.dataset.autoplayDelay) || 6000;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let index = 0;
+    let prevIndex = -1;
+    let timer = 0;
+    let visible = false;
+    let paused = false;
+
+    // Slides are stacked, so wrapping never scrolls back through the middle.
+    // `direction` decides which side the incoming card arrives from; the
+    // outgoing card always leaves towards the opposite side.
+    function render(direction, isInitial) {
+      const arriveFrom = direction === 'prev' ? 'left' : 'right';
+      const exitTo = direction === 'prev' ? 'right' : 'left';
+
+      // Park the incoming card on its arrival side before it is made active.
+      // Without this it would travel from wherever the last render happened to
+      // leave it, so a card reached by going backwards - or one skipped over by
+      // clicking a bar - would slide in from the wrong side. Inactive slides
+      // carry `transition: none`, so this reposition is instant, and the reflow
+      // commits it before the card becomes active: that gap is what gives the
+      // push something to travel from rather than snapping into place.
+      if (!isInitial) {
+        const incoming = slides[index];
+        incoming.setAttribute('aria-hidden', 'true');
+        incoming.removeAttribute('data-exit');
+        incoming.setAttribute('data-from', arriveFrom);
+        void incoming.offsetWidth;
+      }
+
+      slides.forEach((slide, i) => {
+        const active = i === index;
+        const leaving = i === prevIndex && !active;
+        slide.setAttribute('aria-hidden', String(!active));
+        if (active) {
+          slide.removeAttribute('data-from');
+          slide.removeAttribute('data-exit');
+        } else if (leaving) {
+          // The card being shoved out of the way
+          slide.setAttribute('data-from', exitTo);
+          slide.setAttribute('data-exit', exitTo);
+        } else {
+          // Still queued - waits on the side it will arrive from
+          slide.setAttribute('data-from', arriveFrom);
+          slide.removeAttribute('data-exit');
+        }
+        // Keep offscreen cards out of the tab order
+        slide.querySelectorAll('a').forEach((link) => {
+          active ? link.removeAttribute('tabindex') : link.setAttribute('tabindex', '-1');
+        });
+      });
+
+      // Replay the content reveal on the arriving card. Clearing the flag drops
+      // the contents back to their hidden state; the reflow commits that before
+      // the flag goes back on, which is what makes the transition run again.
+      // Skipped on first paint so the initial card doesn't animate in on load.
+      if (!isInitial) {
+        const incoming = slides[index];
+        incoming.removeAttribute('data-revealing');
+        void incoming.offsetWidth;
+        incoming.setAttribute('data-revealing', '');
+      }
+
+      bars.forEach((bar, i) => bar.setAttribute('aria-current', String(i === index)));
+      // The arrow points at the current job, so hide it on the other slides
+      if (indicator) indicator.style.opacity = index === 0 ? '1' : '0';
+
+      prevIndex = index;
+      restartFill();
+    }
+
+    // Reset the active bar to empty, then let it fill over the autoplay delay.
+    // The reflow between the two states is what makes the transition replay.
+    function restartFill() {
+      bars.forEach((bar, i) => {
+        const fill = bar.querySelector('.work-bar-fill');
+        if (!fill) return;
+        if (i === index) {
+          bar.setAttribute('data-paused', 'true');
+          fill.style.transform = 'scaleX(0)';
+          void fill.offsetWidth;
+          bar.style.setProperty('--fill-duration', `${delay}ms`);
+          if (!paused) {
+            bar.removeAttribute('data-paused');
+            fill.style.transform = '';
+          }
+        } else {
+          bar.removeAttribute('data-paused');
+          fill.style.transform = 'scaleX(0)';
+        }
+      });
+    }
+
+    function stop() {
+      if (timer) window.clearTimeout(timer);
+      timer = 0;
+    }
+
+    // Freeze the fill mid-flight rather than snapping it back
+    function pauseFill() {
+      const bar = bars[index];
+      const fill = bar?.querySelector('.work-bar-fill');
+      if (!bar || !fill) return;
+      const current = getComputedStyle(fill).transform;
+      bar.setAttribute('data-paused', 'true');
+      fill.style.transform = current === 'none' ? 'scaleX(0)' : current;
+    }
+
+    // Only runs while the section is on screen, the tab is active, and the
+    // visitor isn't hovering/focusing it
+    function start() {
+      stop();
+      paused = false;
+      if (!visible || document.hidden || reduceMotion.matches) {
+        paused = true;
+        pauseFill();
+        return;
+      }
+      // Resume the countdown from empty
+      restartFill();
+      timer = window.setTimeout(() => {
+        index = (index + 1) % slideCount;
+        render('next');
+        start();
+      }, delay);
+    }
+
+    function pause() {
+      stop();
+      paused = true;
+      pauseFill();
+    }
+
+    // Manual navigation restarts the delay so it doesn't advance immediately after
+    function goTo(next, direction) {
+      const target = (next + slideCount) % slideCount;
+      if (target === index) return;
+      index = target;
+      render(direction);
+      start();
+    }
+
+    // Clicking a bar jumps to that slide
+    bars.forEach((bar, i) =>
+      bar.addEventListener('click', () => goTo(i, i > index ? 'next' : 'prev'))
+    );
+
+    // Pause while reading or tabbing through
+    carousel.addEventListener('mouseenter', pause);
+    carousel.addEventListener('mouseleave', start);
+    carousel.addEventListener('focusin', pause);
+    carousel.addEventListener('focusout', start);
+
+    carousel.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(index - 1, 'prev'); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); goTo(index + 1, 'next'); }
+    });
+
+    document.addEventListener('visibilitychange', () => (document.hidden ? pause() : start()));
+    reduceMotion.addEventListener('change', start);
+
+    new IntersectionObserver(
+      (entries) => {
+        visible = entries[0].isIntersecting;
+        visible ? start() : pause();
+      },
+      { threshold: 0.2 }
+    ).observe(carousel);
+
+    render('next', true);
+  }
+</script>

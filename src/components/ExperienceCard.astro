@@ -5,41 +5,81 @@ interface Props {
   backgroundImage: ImageMetadata;
   logoImage: ImageMetadata;
   logoImageAlt: string;
+  /** Card heading. Falls back to the job role when a project has no title. */
+  projectTitle?: string;
   jobRole: string;
+  /** Only used for image alt text - the logo already names the company */
   companyName?: string;
   description?: string;
   alt?: string;
   href?: string;
   tags?: string[];
+  /**
+   * 'stacked' - image above content, description clamped (grid use)
+   * 'wide'    - image beside content, full description shown (carousel use)
+   */
+  layout?: 'stacked' | 'wide';
 }
 
 const {
   backgroundImage,
   logoImage,
   logoImageAlt,
+  projectTitle = '',
   jobRole,
   companyName = '',
   description = '',
   alt = '',
   href,
-  tags = []
+  tags = [],
+  layout = 'stacked'
 } = Astro.props;
 
+const heading = projectTitle || jobRole;
+// Redundant as a subtitle when it is already doing duty as the heading
+const subtitle = heading === jobRole ? '' : jobRole;
+
 const Tag = href ? 'a' : 'div';
+const isWide = layout === 'wide';
+
+// Wide cards are used in the carousel, which reveals their contents as the card
+// arrives. `--reveal-i` is a text line's place in the stagger and `--reveal-x`
+// how far right it starts. The logo has its own timing and needs neither.
+// Styles are at the bottom of this file.
+const revealOrder = (order: number) =>
+  isWide ? `--reveal-i: ${order}; --reveal-x: ${28 + order * 14}px` : undefined;
 ---
 
 <Tag
   href={href}
-  class="group block bg-white/10 hover:bg-white/20 backdrop-blur-sm overflow-hidden transition-all duration-300"
+  class:list={[
+    'group bg-white/10 hover:bg-white/20 backdrop-blur-sm overflow-hidden transition-all duration-300',
+    // Wide cards get a floor on their height so the carousel doesn't resize
+    // between slides as descriptions vary in length
+    isWide ? 'flex flex-col sm:flex-row h-full sm:min-h-[360px] lg:min-h-[420px]' : 'block'
+  ]}
 >
-  {/* Image area with background + logo overlay */}
-  <div class="relative aspect-video overflow-hidden">
+  {/* Image area with background + logo overlay. On wide cards from sm up it is
+       square: the flex row stretches it to the card's full height and the
+       aspect ratio derives the width from that. Capped at half the card so a
+       long description can't stretch it over the text; stays 16:9 on mobile,
+       where the card stacks and a full-width square would be enormous. */}
+  <div
+    class:list={[
+      'relative overflow-hidden',
+      isWide
+        ? 'shrink-0 aspect-video sm:aspect-square sm:max-w-[50%]'
+        : 'aspect-video'
+    ]}
+  >
     <Image
       src={backgroundImage}
       alt={alt || `${companyName} background`}
       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       widths={[400, 600, 800, 1200]}
-      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+      sizes={isWide
+        ? '(max-width: 640px) 100vw, 420px'
+        : '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw'}
     />
     {/* Dark overlay for better logo visibility */}
     <div
@@ -51,18 +91,43 @@ const Tag = href ? 'a' : 'div';
       <Image
         src={logoImage}
         alt={logoImageAlt}
-        class="max-h-[50px] max-w-[70%] w-auto h-auto object-contain"
+        class:list={[
+          'w-auto h-auto object-contain',
+          // Fades without sliding: it sits centred in the image column, so the
+          // text's lateral drift would read as misalignment on it
+          isWide ? 'logo-reveal max-h-[64px] max-w-[75%]' : 'max-h-[50px] max-w-[70%]'
+        ]}
       />
     </div>
   </div>
 
   {/* Content section */}
-  <div class="p-6">
-    <h3 class="font-heading text-xl text-white mb-2 group-hover:text-[#FAE397] transition-colors">
-      {jobRole}
+  <div class:list={[isWide ? 'flex-1 min-w-0 p-6 sm:p-8 flex flex-col justify-center' : 'p-6']}>
+    {/* Text lines slide in one after another, continuing past the card's
+        landing - unlike the logo, which is timed to finish as it lands. */}
+    <h3
+      class:list={[
+        'font-heading text-white group-hover:text-[#FAE397] transition-colors',
+        isWide ? 'card-reveal text-xl sm:text-2xl mb-1' : 'text-xl mb-2'
+      ]}
+      style={revealOrder(0)}
+    >
+      {heading}
     </h3>
+    {/* Job role - sized to match the description below it */}
+    {isWide && subtitle && (
+      <p class="card-reveal font-job-role text-white/50 tracking-wide text-sm sm:text-base mb-3" style={revealOrder(1)}>
+        {subtitle}
+      </p>
+    )}
     {description && (
-      <p class="font-body text-white/70 text-sm line-clamp-2">
+      <p
+        class:list={[
+          'font-body text-white/70',
+          isWide ? 'card-reveal text-sm sm:text-base leading-relaxed' : 'text-sm line-clamp-3'
+        ]}
+        style={revealOrder(2)}
+      >
         {description}
       </p>
     )}
@@ -77,3 +142,60 @@ const Tag = href ? 'a' : 'div';
     )}
   </div>
 </Tag>
+
+{/* Progressive content reveal for carousel (wide) cards.
+    Global rather than scoped because the `data-revealing` flag it keys off sits
+    on the carousel slide in Work.astro, which has a different scope id - a
+    scoped selector here would never match across that boundary. The classes are
+    only ever emitted when layout="wide", so grid cards are unaffected. */}
+<style is:global>
+  /* Text starts offset to the right, as though the card's leftward push has not
+     yet carried it into place. --reveal-x is the head start; later lines begin
+     further out so the group fans in rather than moving as a block. */
+  .card-reveal {
+    opacity: 0;
+    transform: translateX(var(--reveal-x, 32px));
+  }
+
+  /* The logo fades with no travel, and is timed to be fully opaque exactly as
+     the card lands: 0ms delay + 780ms against the card's 800ms of travel. It is
+     the only element tied to the card's arrival - the text deliberately runs on
+     past it. --card-travel comes from Work.astro so the two stay in step. */
+  .logo-reveal {
+    opacity: 0;
+  }
+
+  [data-revealing] .logo-reveal {
+    opacity: 1;
+    transition: opacity calc(var(--card-travel, 800ms) - 20ms) ease-out;
+  }
+
+  /* Deliberately not scoped to the active slide: the outgoing card keeps its
+     flag so its contents stay put while it is pushed off, rather than blinking
+     out mid-flight. Delay = --reveal-delay (set in Work.astro) plus this line's
+     turn in the queue: project title (0), job role (1), description (2).
+
+     The fade is slower than the travel, so a line is still gaining opacity
+     after it has settled - it eases up rather than snapping in, while the
+     transform's heavy ease-out keeps the coast-to-a-stop motion. */
+  [data-revealing] .card-reveal {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 900ms ease-out
+        calc(var(--reveal-delay, 260ms) + var(--reveal-i, 0) * 130ms),
+      transform 760ms cubic-bezier(0.1, 0.85, 0.2, 1)
+        calc(var(--reveal-delay, 260ms) + var(--reveal-i, 0) * 130ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-reveal,
+    [data-revealing] .card-reveal,
+    .logo-reveal,
+    [data-revealing] .logo-reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
